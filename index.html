@@ -136,6 +136,15 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 }
 .add-custom:active{border-color:var(--herb);color:var(--herb);}
 
+/* ---------- Quick add buttons ---------- */
+.quick-add-title{font-size:11.5px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:var(--space-3) 0 8px;}
+.quick-add-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.quick-add-btn{
+  padding:9px 14px;border-radius:20px;border:1.5px solid var(--line);background:var(--cream);
+  color:var(--ink);font-family:inherit;font-size:12.5px;font-weight:600;min-height:38px;
+}
+.quick-add-btn:active{background:var(--herb);color:#fff;border-color:var(--herb);}
+
 /* ---------- Photo scan buttons ---------- */
 .photo-btn-row{display:flex;gap:var(--space-2);margin-top:var(--space-3);}
 .photo-btn{
@@ -617,6 +626,22 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
           <div class="results" id="searchResults"></div>
         </div>
         <button class="add-custom" id="addCustomBtn">+ מזון לא נמצא? הוסף מזון מותאם אישית</button>
+
+        <div class="quick-add-title">הוספה מהירה</div>
+        <div class="quick-add-grid">
+          <button class="quick-add-btn" data-food="חזה עוף מבושל">חזה עוף</button>
+          <button class="quick-add-btn" data-food="אורז לבן מבושל">אורז</button>
+          <button class="quick-add-btn" data-food="שעועית ירוקה מבושלת">שעועית ירוקה</button>
+          <button class="quick-add-btn" data-food="סלט ירקות ישראלי">סלט ירקות</button>
+          <button class="quick-add-btn" data-food="פירה תפוחי אדמה">פירה</button>
+          <button class="quick-add-btn" data-food="שניצל עוף">שניצל מטוגן</button>
+          <button class="quick-add-btn" data-food="המבורגר בלחמנייה">המבורגר</button>
+          <button class="quick-add-btn" id="quickAddEgg">ביצה מבושלת</button>
+          <button class="quick-add-btn" id="quickAddOmelette">חביתה</button>
+          <button class="quick-add-btn" data-food="בגט">בגט</button>
+          <button class="quick-add-btn" data-food="לחם מלא">לחם קמח מלא</button>
+        </div>
+
         <div class="photo-btn-row">
           <button class="photo-btn" id="photoBtnCamera">📷 צלם תמונה</button>
           <button class="photo-btn gallery" id="photoBtnGallery">🖼️ העלה מהגלריה</button>
@@ -827,6 +852,8 @@ const FOOD_DB = [
   {name:"פסטה מבושלת",cat:"דגנים",kcal:158,p:5.8,c:31,f:0.9},
   {name:"לחם לבן",cat:"דגנים",kcal:265,p:9,c:49,f:3.2},
   {name:"לחם מלא",cat:"דגנים",kcal:247,p:13,c:41,f:3.4},
+  {name:"בגט",cat:"דגנים",kcal:270,p:9,c:55,f:2},
+  {name:"פירה תפוחי אדמה",cat:"תוספות",kcal:113,p:2,c:17,f:4.2},
   {name:"פיתה",cat:"דגנים",kcal:275,p:9,c:55,f:1.2},
   {name:"קוואקר / שיבולת שועל",cat:"דגנים",kcal:389,p:16.9,c:66,f:6.9},
   {name:"קינואה מבושלת",cat:"דגנים",kcal:120,p:4.4,c:21,f:1.9},
@@ -1760,37 +1787,39 @@ const qtyInput = document.getElementById('qtyInput');
 function openQtySheet(food){
   selectedFood = food;
   document.getElementById('qtyFoodName').textContent = food.name;
+  const unitLabel = food.unitLabel || (food.perServing ? 'מנה' : '100 גרם');
   document.getElementById('qtyFoodMeta').textContent =
-    `${food.kcal} קק"ל ל-${food.perServing?'מנה':'100 גרם'} · חלבון ${food.p}g · פחמימה ${food.c}g · שומן ${food.f}g`;
-  qtyInput.value = food.perServing ? 1 : 100;
-  document.querySelector('.qty-unit').textContent = food.perServing ? 'מנות' : 'גרם';
+    `${food.kcal} קק"ל ל-${unitLabel} · חלבון ${food.p}g · פחמימה ${food.c}g · שומן ${food.f}g`;
+  qtyInput.value = (food.perServing || food.unitLabel) ? (food.defaultQty || 1) : 100;
+  document.querySelector('.qty-unit').textContent = food.unitLabel || (food.perServing ? 'מנות' : 'גרם');
   updateQtyPreview();
   qtyOverlay.classList.remove('hidden');
 }
 function updateQtyPreview(){
   const qty = parseFloat(qtyInput.value) || 0;
-  const factor = selectedFood.perServing ? qty : (qty/100);
+  const factor = (selectedFood.perServing || selectedFood.unitLabel) ? qty : (qty/100);
   document.getElementById('qtyKcalPreview').textContent = Math.round(selectedFood.kcal * factor);
 }
 qtyInput.addEventListener('input', updateQtyPreview);
 document.getElementById('qtyMinus').addEventListener('click', ()=>{
-  const step = selectedFood.perServing ? 1 : 10;
+  const step = (selectedFood.perServing || selectedFood.unitLabel) ? 1 : 10;
   qtyInput.value = Math.max(0, (parseFloat(qtyInput.value)||0) - step);
   updateQtyPreview();
 });
 document.getElementById('qtyPlus').addEventListener('click', ()=>{
-  const step = selectedFood.perServing ? 1 : 10;
+  const step = (selectedFood.perServing || selectedFood.unitLabel) ? 1 : 10;
   qtyInput.value = (parseFloat(qtyInput.value)||0) + step;
   updateQtyPreview();
 });
 document.getElementById('qtyCancel').addEventListener('click', ()=> qtyOverlay.classList.add('hidden'));
 document.getElementById('qtyConfirm').addEventListener('click', ()=>{
   const qty = parseFloat(qtyInput.value) || 0;
-  const factor = selectedFood.perServing ? qty : (qty/100);
+  const factor = (selectedFood.perServing || selectedFood.unitLabel) ? qty : (qty/100);
   const day = getDayData(currentOffset);
+  const unitWord = selectedFood.unitLabel || (selectedFood.perServing ? 'מנות' : 'גרם');
   day.log.push({
     name: selectedFood.name,
-    qtyLabel: selectedFood.perServing ? `${qty} מנות` : `${qty} גרם`,
+    qtyLabel: `${qty} ${unitWord}`,
     kcal: selectedFood.kcal * factor,
     p: selectedFood.p * factor,
     c: selectedFood.c * factor,
@@ -1801,6 +1830,20 @@ document.getElementById('qtyConfirm').addEventListener('click', ()=>{
   searchInput.value = '';
   resultsBox.innerHTML = '';
   render();
+});
+
+// ---------- Quick add buttons ----------
+document.querySelectorAll('.quick-add-btn[data-food]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const food = findFood(btn.dataset.food) || customFoods.find(f=>f.name===btn.dataset.food);
+    if(food) openQtySheet(food);
+  });
+});
+document.getElementById('quickAddEgg').addEventListener('click', ()=>{
+  openQtySheet({ name:"ביצה קשה", kcal:78, p:6.5, c:0.55, f:5.5, perServing:true, unitLabel:"ביצים", defaultQty:1 });
+});
+document.getElementById('quickAddOmelette').addEventListener('click', ()=>{
+  openQtySheet({ name:"חביתה", kcal:90, p:6.5, c:0.75, f:7, perServing:true, unitLabel:"ביצים", defaultQty:2 });
 });
 
 // ---------- Custom food ----------
