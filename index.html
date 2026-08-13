@@ -98,6 +98,15 @@ h1,h2,h3{margin:0;font-family:var(--font-body);}
 /* ---------- Progress card ---------- */
 .goal-breakdown{font-size:10.5px;color:var(--ink-soft);margin-top:4px;text-align:center;}
 .progress-foot{display:flex;justify-content:center;margin-top:var(--space-2);font-size:12.5px;color:var(--ink-soft);font-weight:500;}
+
+/* ---------- Daily quote banner ---------- */
+.quote-banner{
+  display:flex;align-items:center;gap:10px;background:var(--herb);color:#fff;
+  border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:var(--space-4);
+  box-shadow:var(--shadow-card);
+}
+.quote-icon{font-size:22px;flex-shrink:0;}
+.quote-text{font-size:13.5px;font-weight:600;line-height:1.5;}
 .macro-row{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-2);margin-top:var(--space-4);}
 .macro-chip{background:var(--cream);border-radius:var(--radius-sm);padding:var(--space-2) 4px;text-align:center;}
 .macro-chip .v{font-family:var(--font-mono);font-size:16px;font-weight:700;}
@@ -556,6 +565,11 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
 
     <!-- Page 2: Today -->
     <section class="page">
+      <div class="quote-banner" id="quoteBanner">
+        <span class="quote-icon">☀️</span>
+        <span class="quote-text" id="quoteText"></span>
+      </div>
+
       <div class="card">
         <div class="ring-section">
           <div class="ring-wrap">
@@ -1015,6 +1029,44 @@ const BMI_BASE = "calTracker_bmi_v1";
 const USERS_KEY = "calTracker_users_v1";
 const SESSION_KEY = "calTracker_session_v1";
 const HABITS_TEMPLATE = ["30 דקות פעילות גופנית","אכלתי ירקות בכל ארוחה","שינה 7+ שעות"];
+
+const MOTIVATIONAL_QUOTES = [
+  "כל יום שבו אתה בוחר בבריאות שלך הוא ניצחון — גם אם הוא לא מושלם.",
+  "לא צריך יום מושלם, צריך יום טוב יותר מאתמול.",
+  "אתה לא מתחיל מאפס — אתה מתחיל מניסיון.",
+  "התמדה קטנה היום שווה יותר ממאמץ ענק שנעלם מחר.",
+  "הגוף שלך מקשיב לכל בחירה טובה שאתה עושה — גם הקטנות.",
+  "היום הוא הזדמנות חדשה, לא המשך של אתמול.",
+  "הדרך לירידה במשקל עוברת דרך החלטות קטנות, לא דרמות גדולות.",
+  "אתה לא צריך להיות מושלם, רק עקבי.",
+  "כל כוס מים, כל צעד, כל ארוחה מאוזנת — הכל נספר.",
+  "תן לעצמך קרדיט על כל דבר טוב שעשית היום, גם אם הוא קטן.",
+  "השינוי האמיתי קורה בין הרגעים הגדולים — בבחירות היומיומיות.",
+  "אתה בונה הרגל, לא רק יורד במשקל.",
+  "מותר לטעות. מה שחשוב זה לחזור למסלול.",
+  "הגוף שלך עובד בשבילך כל יום — תחזיר לו את הטובה.",
+  "אתה חזק יותר ממה שאתמול חשבת.",
+  "לא משנה כמה לאט אתה הולך, כל עוד אתה לא עוצר.",
+  "היום זה יום טוב להתחיל שוב, גם אם כבר התחלת אתמול.",
+  "תזונה טובה היא מתנה שאתה נותן לעצמך, לא עונש.",
+  "הביטחון מגיע מהפעולות הקטנות שאתה חוזר עליהן.",
+  "אתה לא לבד במסע הזה — כל יום מישהו אחר מתחיל בדיוק כמוך.",
+  "תן לגוף שלך זמן — הוא לא נבנה ביום אחד, והוא גם לא ישתנה ביום אחד.",
+  "הצלחה זה לא מושלמות, זה להראות שוב ושוב.",
+  "כל בחירה בריאה היום היא השקעה בך של מחר.",
+  "אתה כבר בדרך — תמשיך ללכת.",
+  "גם צעד קטן קדימה הוא עדיין קדימה."
+];
+
+function dailyQuote(){
+  const today = new Date();
+  const dateStr = today.toISOString().slice(0,10);
+  let hash = 0;
+  for(let i=0;i<dateStr.length;i++){ hash = (hash*31 + dateStr.charCodeAt(i)) % 100000; }
+  const idx = hash % MOTIVATIONAL_QUOTES.length;
+  return MOTIVATIONAL_QUOTES[idx];
+}
+document.getElementById('quoteText').textContent = dailyQuote();
 const MET_TABLE = {
   "הליכה": 3.5,
   "הליכה מהירה": 4.5,
@@ -1513,6 +1565,30 @@ const MENU_TEMPLATES = [
     { title:"ארוחת צהריים", items:[{food:"בקר טחון רזה מטוגן",grams:130},{food:"בטטה אפויה",grams:150},{food:"ברוקולי מבושל",grams:100}] },
     { title:"ארוחת ערב", items:[{food:"הודו טחון",grams:150},{food:"קישוא",grams:150},{food:"חומוס (סלט)",grams:60}] },
     { title:"נשנוש", items:[{food:"יוגורט טבעי 3%",grams:150},{food:"תות שדה",grams:100}] }
+  ]},
+  { name: "תפריט ים-תיכוני קליל", meals: [
+    { title:"ארוחת בוקר", items:[{food:"ביצה קשה",grams:100},{food:"אבוקדו",grams:50},{food:"עגבנייה",grams:80}] },
+    { title:"ארוחת צהריים", items:[{food:"סלמון אפוי",grams:130},{food:"קינואה מבושלת",grams:100},{food:"ברוקולי מבושל",grams:100}] },
+    { title:"ארוחת ערב", items:[{food:"עדשים מבושלות",grams:180},{food:"מלפפון",grams:80},{food:"עגבנייה",grams:80}] },
+    { title:"נשנוש", items:[{food:"תפוח עץ",grams:150}] }
+  ]},
+  { name: "תפריט חלבון גבוה קל", meals: [
+    { title:"ארוחת בוקר", items:[{food:"קוטג' 5%",grams:150},{food:"מלפפון",grams:80}] },
+    { title:"ארוחת צהריים", items:[{food:"הודו טחון",grams:150},{food:"אורז לבן מבושל",grams:120},{food:"ברוקולי מבושל",grams:100}] },
+    { title:"ארוחת ערב", items:[{food:"חזה עוף מבושל",grams:130},{food:"קישוא",grams:150}] },
+    { title:"נשנוש", items:[{food:"יוגורט יווני",grams:150}] }
+  ]},
+  { name: "תפריט דל פחמימות", meals: [
+    { title:"ארוחת בוקר", items:[{food:"ביצה קשה",grams:120},{food:"עגבנייה",grams:80}] },
+    { title:"ארוחת צהריים", items:[{food:"בקר טחון רזה מטוגן",grams:130},{food:"כרובית מבושלת",grams:150},{food:"סלט ירקות ישראלי",grams:100}] },
+    { title:"ארוחת ערב", items:[{food:"סלמון אפוי",grams:120},{food:"חסה",grams:60},{food:"מלפפון",grams:80}] },
+    { title:"נשנוש", items:[{food:"שקדים",grams:15}] }
+  ]},
+  { name: "תפריט צמחוני עשיר בחלבון", meals: [
+    { title:"ארוחת בוקר", items:[{food:"יוגורט יווני",grams:150},{food:"שקדים",grams:15},{food:"תות שדה",grams:100}] },
+    { title:"ארוחת צהריים", items:[{food:"טופו",grams:150},{food:"קינואה מבושלת",grams:120},{food:"ברוקולי מבושל",grams:100}] },
+    { title:"ארוחת ערב", items:[{food:"עדשים מבושלות",grams:200},{food:"סלט ירקות ישראלי",grams:100}] },
+    { title:"נשנוש", items:[{food:"תפוח עץ",grams:150}] }
   ]}
 ];
 
