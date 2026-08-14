@@ -312,6 +312,7 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .log-item .li-qty{font-size:11px;color:var(--ink-soft);margin-top:1px;}
 .log-item .li-kcal{font-weight:700;white-space:nowrap;font-family:var(--font-mono);font-size:14px;}
 .log-item .li-del{background:var(--cream);border:none;color:var(--paprika);width:34px;height:34px;border-radius:var(--radius-sm);font-size:15px;flex-shrink:0;}
+.log-item .li-dup{background:var(--cream);border:none;color:var(--herb);width:34px;height:34px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;flex-shrink:0;}
 .log-empty{text-align:center;padding:32px 10px;color:var(--ink-soft);font-size:13px;}
 .receipt-total{
   display:flex;justify-content:space-between;align-items:center;padding:14px 0 12px;
@@ -1090,14 +1091,33 @@ const MOTIVATIONAL_QUOTES = [
   "גם צעד קטן קדימה הוא עדיין קדימה."
 ];
 
+const TAL_QUOTES = [
+  "בוקר טוב נסיכה, את עושה עבודה נפלאה 👑",
+  "בוקר טוב יפהפייה, כל יום שאת מתמידה זה עוד ניצחון קטן 💪",
+  "בוקר טוב נסיכה, את חזקה יותר ממה שאת חושבת 🌸",
+  "בוקר טוב מתוקה, גאה בך על כל צעד שאת עושה 👑",
+  "בוקר טוב נסיכה, היום הוא עוד הזדמנות להיות הגרסה הכי טובה שלך ✨",
+  "בוקר טוב יפה שלי, ההתמדה שלך מדהימה — תמשיכי ככה 💕",
+  "בוקר טוב נסיכה, גם היום את עושה את זה נכון 🌟",
+  "בוקר טוב מלכה, כל בחירה קטנה שלך היום היא ניצחון 👑",
+  "בוקר טוב נסיכה, תזכרי כמה כבר הצלחת עד עכשיו 🌸",
+  "בוקר טוב אהובה, את משקיעה בעצמך וזה הכי יפה שיש 💖",
+  "בוקר טוב נסיכה, תהיי גאה בעצמך — את מתמידה ומדהימה 👑",
+  "בוקר טוב יקירה, כל יום את בונה גרסה חזקה יותר של עצמך 🌷",
+  "בוקר טוב נסיכה, הדרך שלך היא שלך — ואת עושה אותה נהדר ✨",
+  "בוקר טוב מתוקה, לא משנה מה קרה אתמול — היום זה יום חדש 💫",
+  "בוקר טוב נסיכה, את משאירה חותם של עקביות והתמדה 👑"
+];
+
 function dailyQuote(){
-  if(currentUserName === "טל"){
-    return "בוקר טוב נסיכה, את עושה עבודה נפלאה 👑";
-  }
   const today = new Date();
   const dateStr = today.toISOString().slice(0,10);
   let hash = 0;
   for(let i=0;i<dateStr.length;i++){ hash = (hash*31 + dateStr.charCodeAt(i)) % 100000; }
+  if(currentUserName === "טל"){
+    const idx = hash % TAL_QUOTES.length;
+    return TAL_QUOTES[idx];
+  }
   const idx = hash % MOTIVATIONAL_QUOTES.length;
   return MOTIVATIONAL_QUOTES[idx];
 }
@@ -1327,9 +1347,19 @@ function render(){
           <div class="li-qty">${item.qtyLabel}</div>
         </div>
         <div class="li-kcal">${Math.round(item.kcal)} קק"ל</div>
+        <button class="li-dup" data-idx="${idx}" title="הכפל כמות">×2</button>
         <button class="li-del" data-idx="${idx}" title="מחק">✕</button>
       </div>
     `).join('');
+    logList.querySelectorAll('.li-dup').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const idx = parseInt(btn.dataset.idx);
+        const item = day.log[idx];
+        day.log.splice(idx+1, 0, { name:item.name, qtyLabel:item.qtyLabel, kcal:item.kcal, p:item.p, c:item.c, f:item.f });
+        saveAll(allData);
+        render();
+      });
+    });
     logList.querySelectorAll('.li-del').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const idx = parseInt(btn.dataset.idx);
