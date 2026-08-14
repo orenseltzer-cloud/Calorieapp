@@ -1751,7 +1751,7 @@ function buildMenu(targetKcal, day, preference){
   const anchorTotal = Object.values(anchors).reduce((s,a)=>s+a.kcal, 0);
   const nonAnchoredMeals = MEAL_SLOTS.filter(m=>!anchors[m]);
   const nonAnchoredWeightSum = nonAnchoredMeals.reduce((s,m)=>s+MEAL_WEIGHTS[m], 0) || 1;
-  const remainingBudget = Math.max(200, targetKcal - anchorTotal);
+  const remainingBudget = Math.max(80, targetKcal - anchorTotal);
 
   const mealsOut = {};
   let grandTotal = { kcal:0, p:0, c:0, f:0 };
@@ -1775,7 +1775,7 @@ function buildMenu(targetKcal, day, preference){
     const baseTotal = items.reduce((s,it)=> s + it.food.kcal*it.grams/100, 0) || 1;
     const slotBudget = remainingBudget * (MEAL_WEIGHTS[mealTitle]/nonAnchoredWeightSum);
     let scale = slotBudget / baseTotal;
-    scale = Math.max(0.5, Math.min(2, scale));
+    scale = Math.max(0.15, Math.min(2.5, scale));
     mealsOut[mealTitle] = items.map(it=>{
       const scaledGrams = Math.max(5, Math.round(it.grams*scale/5)*5);
       const factor = scaledGrams/100;
@@ -1808,7 +1808,9 @@ document.querySelectorAll('.pref-chip').forEach(chip=>{
 document.getElementById('menuSuggestBtn').addEventListener('click', ()=>{
   const day = getDayData(currentOffset);
   const burnTotal = day.activities.reduce((s,a)=>s+a.burn, 0);
-  const targetKcal = (day.goal + burnTotal) || 1800;
+  const consumedKcal = (day.log||[]).reduce((s,i)=>s+i.kcal, 0);
+  const adjustedGoal = (day.goal + burnTotal) || 1800;
+  const targetKcal = Math.max(80, adjustedGoal - consumedKcal);
   const menu = buildMenu(targetKcal, day, selectedMenuPreference);
   lastSuggestedMenu = menu;
 
@@ -1827,7 +1829,8 @@ document.getElementById('menuSuggestBtn').addEventListener('click', ()=>{
   document.getElementById('menuSuggestion').innerHTML = `
     <div class="bmi-hint" style="margin-bottom:var(--space-2);font-weight:700;color:var(--ink);">${escapeHtml(menu.templateName)}</div>
     ${mealsHtml}
-    <div class="menu-total-row"><span>סה"כ ליום</span><span>${Math.round(menu.total.kcal)} קק"ל</span></div>
+    <div class="menu-total-row"><span>סה"כ הצעה זו</span><span>${Math.round(menu.total.kcal)} קק"ל</span></div>
+    <div class="bmi-hint" style="text-align:center;margin-top:4px;">מבוסס על הקלוריות שנותרו לך עכשיו (כולל מה שכבר אכלת ואת העוגנים)</div>
     <div class="menu-actions">
       <button class="use-goal-btn" id="menuAddAllBtn" style="margin-top:0;">הוסף הכל ליומן</button>
     </div>
