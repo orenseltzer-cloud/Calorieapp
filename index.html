@@ -215,6 +215,18 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
   padding:8px 12px;font-size:12px;
 }
 
+/* ---------- Weight save feedback ---------- */
+.weight-feedback{
+  margin-top:var(--space-3);padding:14px 16px;border-radius:var(--radius-md);
+  font-size:13.5px;font-weight:600;line-height:1.5;text-align:center;
+  animation:feedbackIn .3s ease;
+}
+.weight-feedback.hidden{display:none;}
+.weight-feedback.positive{background:#E8F3EA;color:var(--herb-dark);border:1.5px solid var(--herb);}
+.weight-feedback.encourage{background:#FBEFE9;color:var(--paprika-dark);border:1.5px solid var(--paprika);}
+.weight-feedback.neutral{background:var(--cream);color:var(--ink-soft);border:1.5px solid var(--line);}
+@keyframes feedbackIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+
 /* ---------- Menu suggestion & craving buster ---------- */
 .menu-meal{margin-bottom:var(--space-3);padding-bottom:var(--space-3);border-bottom:1px dashed var(--line);}
 .menu-meal:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}
@@ -244,6 +256,15 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
   border-radius:var(--radius-sm);padding:8px 12px;margin-top:8px;font-size:12.5px;
 }
 .anchor-item .ai-del{background:none;border:none;color:var(--paprika);font-size:14px;}
+
+/* ---------- Menu preference chips ---------- */
+.pref-title{font-size:11.5px;color:var(--ink-soft);font-weight:700;margin:var(--space-3) 0 8px;}
+.pref-chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:var(--space-3);}
+.pref-chip{
+  padding:8px 13px;border-radius:18px;border:1.5px solid var(--line);background:var(--cream);
+  color:var(--ink);font-family:inherit;font-size:12px;font-weight:600;min-height:36px;
+}
+.pref-chip.active{background:var(--herb);color:#fff;border-color:var(--herb);}
 .calc-btn{width:100%;padding:13px;border:none;border-radius:var(--radius-sm);background:var(--ink);color:var(--cream);font-family:inherit;font-size:14px;font-weight:700;min-height:48px;}
 .calc-btn:active{background:#000;}
 .gc-result{margin-top:var(--space-4);background:var(--cream);border-radius:var(--radius-sm);padding:var(--space-3) 14px;}
@@ -498,6 +519,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
           </div>
           <button class="calc-btn" id="weightSaveBtn" style="flex:0 0 auto;width:auto;padding:12px 20px;min-height:46px;">שמור</button>
         </div>
+        <div id="weightFeedback"></div>
         <div id="weightChartWrap" style="margin-top:var(--space-4);"></div>
         <div id="weightSummary" class="bmi-hint" style="margin-top:var(--space-2);text-align:center;"></div>
       </div>
@@ -689,6 +711,16 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
             <button id="anchorAddBtn">הוסף עוגן</button>
           </div>
           <div id="anchorList"></div>
+        </div>
+
+        <div class="pref-title">יש לך העדפה היום?</div>
+        <div class="pref-chip-row" id="prefChipRow">
+          <button class="pref-chip" data-pref="קליל">קליל</button>
+          <button class="pref-chip" data-pref="בשרי">בשרי</button>
+          <button class="pref-chip" data-pref="צמחוני">צמחוני</button>
+          <button class="pref-chip" data-pref="דל פחמימות">דל פחמימות</button>
+          <button class="pref-chip" data-pref="עתיר חלבון">עתיר חלבון</button>
+          <button class="pref-chip" data-pref="ללא דגים">ללא דגים</button>
         </div>
 
         <button class="calc-btn" id="menuSuggestBtn">הצע לי תפריט להיום</button>
@@ -1059,6 +1091,9 @@ const MOTIVATIONAL_QUOTES = [
 ];
 
 function dailyQuote(){
+  if(currentUserName === "טל"){
+    return "בוקר טוב נסיכה, את עושה עבודה נפלאה 👑";
+  }
   const today = new Date();
   const dateStr = today.toISOString().slice(0,10);
   let hash = 0;
@@ -1066,7 +1101,6 @@ function dailyQuote(){
   const idx = hash % MOTIVATIONAL_QUOTES.length;
   return MOTIVATIONAL_QUOTES[idx];
 }
-document.getElementById('quoteText').textContent = dailyQuote();
 const MET_TABLE = {
   "הליכה": 3.5,
   "הליכה מהירה": 4.5,
@@ -1137,6 +1171,7 @@ function enterApp(userId, name){
   document.getElementById('userNameLabel').textContent = name;
   document.getElementById('userAvatar').textContent = initials(name);
   document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('quoteText').textContent = dailyQuote();
   currentOffset = 0;
   render();
   renderBmi();
@@ -1366,6 +1401,9 @@ function renderBmi(){
 
 // ---------- Daily weight tracking ----------
 function renderWeightCard(day){
+  const fb = document.getElementById('weightFeedback');
+  fb.className = 'weight-feedback hidden';
+  fb.textContent = '';
   const label = document.getElementById('weightForLabel');
   label.textContent = currentOffset === 0 ? 'משקל להיום (ק"ג)' : `משקל ל-${dayLabelText(currentOffset)} (ק"ג)`;
   const input = document.getElementById('weightInput');
@@ -1489,7 +1527,11 @@ document.getElementById('weightSaveBtn').addEventListener('click', ()=>{
     alert('נא להזין משקל תקין');
     return;
   }
-  const isFirstEver = getFullWeightSeries().length === 0;
+  const fullSeriesBefore = getFullWeightSeries();
+  const isFirstEver = fullSeriesBefore.length === 0;
+  const todayKey = dateKey(currentOffset);
+  const previousEntry = fullSeriesBefore.filter(e => e.date < todayKey).pop();
+
   const day = getDayData(currentOffset);
   day.weight = val;
   if(isFirstEver && bmiData.startingWeight == null){
@@ -1498,7 +1540,33 @@ document.getElementById('weightSaveBtn').addEventListener('click', ()=>{
   }
   saveAll(allData);
   render();
+  showWeightFeedback(val, previousEntry, isFirstEver);
 });
+
+function showWeightFeedback(newVal, previousEntry, isFirstEver){
+  const el = document.getElementById('weightFeedback');
+  if(isFirstEver){
+    el.className = 'weight-feedback neutral';
+    el.textContent = '👋 שמרנו את המדידה הראשונה שלך — מכאן נתחיל לעקוב אחרי ההתקדמות!';
+    return;
+  }
+  if(!previousEntry){
+    el.className = 'weight-feedback hidden';
+    el.textContent = '';
+    return;
+  }
+  const diff = newVal - previousEntry.weight;
+  if(diff < -0.05){
+    el.className = 'weight-feedback positive';
+    el.textContent = `🎉 ירדת ${Math.abs(diff).toFixed(1)} ק"ג מהמדידה הקודמת — כל הכבוד, תמשיך/י ככה!`;
+  } else if(diff > 0.05){
+    el.className = 'weight-feedback encourage';
+    el.textContent = `יש עלייה קטנה של ${diff.toFixed(1)} ק"ג — זה קורה, וזה לא שובר כלום. תמשיך/י הלאה, זה חלק מהדרך 💪`;
+  } else {
+    el.className = 'weight-feedback neutral';
+    el.textContent = 'המשקל נשאר יציב מהמדידה הקודמת — גם יציבות היא התקדמות.';
+  }
+}
 
 function renderHabits(day){
   const list = document.getElementById('habitList');
@@ -1548,43 +1616,43 @@ function escapeHtml(str){
 
 // ---------- Daily menu suggestion ----------
 const MENU_TEMPLATES = [
-  { name: "תפריט מאוזן", meals: [
+  { name: "תפריט מאוזן", tags:["בשרי","דגים"], meals: [
     { title:"ארוחת בוקר", items:[{food:"ביצה קשה",grams:120},{food:"לחם מלא",grams:60},{food:"עגבנייה",grams:80}] },
     { title:"ארוחת צהריים", items:[{food:"חזה עוף מבושל",grams:150},{food:"אורז מלא מבושל",grams:150},{food:"ברוקולי מבושל",grams:100}] },
     { title:"ארוחת ערב", items:[{food:"סלמון אפוי",grams:120},{food:"קינואה מבושלת",grams:120},{food:"חסה",grams:60}] },
     { title:"נשנוש", items:[{food:"יוגורט יווני",grams:150},{food:"שקדים",grams:15}] }
   ]},
-  { name: "תפריט צמחוני ים-תיכוני", meals: [
+  { name: "תפריט צמחוני ים-תיכוני", tags:["צמחוני","קליל"], meals: [
     { title:"ארוחת בוקר", items:[{food:"קוטג' 5%",grams:150},{food:"לחם מלא",grams:60},{food:"מלפפון",grams:80}] },
     { title:"ארוחת צהריים", items:[{food:"עדשים מבושלות",grams:200},{food:"אורז לבן מבושל",grams:100},{food:"עגבנייה",grams:100}] },
     { title:"ארוחת ערב", items:[{food:"טופו",grams:150},{food:"קוסקוס מבושל",grams:120},{food:"קישוא",grams:100}] },
     { title:"נשנוש", items:[{food:"תפוח עץ",grams:150},{food:"חמאת בוטנים",grams:15}] }
   ]},
-  { name: "תפריט עתיר חלבון", meals: [
+  { name: "תפריט עתיר חלבון", tags:["עתיר חלבון","בשרי"], meals: [
     { title:"ארוחת בוקר", items:[{food:"ביצה קשה",grams:120},{food:"אבוקדו",grams:50},{food:"עגבנייה",grams:80}] },
     { title:"ארוחת צהריים", items:[{food:"בקר טחון רזה מטוגן",grams:130},{food:"בטטה אפויה",grams:150},{food:"ברוקולי מבושל",grams:100}] },
     { title:"ארוחת ערב", items:[{food:"הודו טחון",grams:150},{food:"קישוא",grams:150},{food:"חומוס (סלט)",grams:60}] },
     { title:"נשנוש", items:[{food:"יוגורט טבעי 3%",grams:150},{food:"תות שדה",grams:100}] }
   ]},
-  { name: "תפריט ים-תיכוני קליל", meals: [
+  { name: "תפריט ים-תיכוני קליל", tags:["קליל","דגים"], meals: [
     { title:"ארוחת בוקר", items:[{food:"ביצה קשה",grams:100},{food:"אבוקדו",grams:50},{food:"עגבנייה",grams:80}] },
     { title:"ארוחת צהריים", items:[{food:"סלמון אפוי",grams:130},{food:"קינואה מבושלת",grams:100},{food:"ברוקולי מבושל",grams:100}] },
     { title:"ארוחת ערב", items:[{food:"עדשים מבושלות",grams:180},{food:"מלפפון",grams:80},{food:"עגבנייה",grams:80}] },
     { title:"נשנוש", items:[{food:"תפוח עץ",grams:150}] }
   ]},
-  { name: "תפריט חלבון גבוה קל", meals: [
+  { name: "תפריט חלבון גבוה קל", tags:["עתיר חלבון","בשרי","קליל"], meals: [
     { title:"ארוחת בוקר", items:[{food:"קוטג' 5%",grams:150},{food:"מלפפון",grams:80}] },
     { title:"ארוחת צהריים", items:[{food:"הודו טחון",grams:150},{food:"אורז לבן מבושל",grams:120},{food:"ברוקולי מבושל",grams:100}] },
     { title:"ארוחת ערב", items:[{food:"חזה עוף מבושל",grams:130},{food:"קישוא",grams:150}] },
     { title:"נשנוש", items:[{food:"יוגורט יווני",grams:150}] }
   ]},
-  { name: "תפריט דל פחמימות", meals: [
+  { name: "תפריט דל פחמימות", tags:["דל פחמימות","בשרי","דגים"], meals: [
     { title:"ארוחת בוקר", items:[{food:"ביצה קשה",grams:120},{food:"עגבנייה",grams:80}] },
     { title:"ארוחת צהריים", items:[{food:"בקר טחון רזה מטוגן",grams:130},{food:"כרובית מבושלת",grams:150},{food:"סלט ירקות ישראלי",grams:100}] },
     { title:"ארוחת ערב", items:[{food:"סלמון אפוי",grams:120},{food:"חסה",grams:60},{food:"מלפפון",grams:80}] },
     { title:"נשנוש", items:[{food:"שקדים",grams:15}] }
   ]},
-  { name: "תפריט צמחוני עשיר בחלבון", meals: [
+  { name: "תפריט צמחוני עשיר בחלבון", tags:["צמחוני","עתיר חלבון"], meals: [
     { title:"ארוחת בוקר", items:[{food:"יוגורט יווני",grams:150},{food:"שקדים",grams:15},{food:"תות שדה",grams:100}] },
     { title:"ארוחת צהריים", items:[{food:"טופו",grams:150},{food:"קינואה מבושלת",grams:120},{food:"ברוקולי מבושל",grams:100}] },
     { title:"ארוחת ערב", items:[{food:"עדשים מבושלות",grams:200},{food:"סלט ירקות ישראלי",grams:100}] },
@@ -1599,13 +1667,22 @@ function findFood(name){
 const MEAL_SLOTS = ["ארוחת בוקר","ארוחת צהריים","ארוחת ערב","נשנוש"];
 const MEAL_WEIGHTS = {"ארוחת בוקר":0.25,"ארוחת צהריים":0.35,"ארוחת ערב":0.30,"נשנוש":0.10};
 
-function buildMenu(targetKcal, day){
+function buildMenu(targetKcal, day, preference){
   const eatenNames = new Set((day.log||[]).map(i=>i.name));
   const anchors = day.anchors || {};
 
+  // Narrow down by preference first (fall back to all templates if the preference would exclude everything)
+  let pool = MENU_TEMPLATES;
+  if(preference){
+    const filtered = preference === "ללא דגים"
+      ? MENU_TEMPLATES.filter(t => !(t.tags||[]).includes("דגים"))
+      : MENU_TEMPLATES.filter(t => (t.tags||[]).includes(preference));
+    if(filtered.length > 0) pool = filtered;
+  }
+
   // Pick the template with the fewest overlaps with foods already eaten today
   let bestConflicts = Infinity;
-  MENU_TEMPLATES.forEach(t=>{
+  pool.forEach(t=>{
     let conflicts = 0;
     t.meals.forEach(meal=>{
       if(anchors[meal.title]) return;
@@ -1613,7 +1690,7 @@ function buildMenu(targetKcal, day){
     });
     if(conflicts < bestConflicts) bestConflicts = conflicts;
   });
-  const candidates = MENU_TEMPLATES.filter(t=>{
+  const candidates = pool.filter(t=>{
     let conflicts = 0;
     t.meals.forEach(meal=>{
       if(anchors[meal.title]) return;
@@ -1665,11 +1742,26 @@ function buildMenu(targetKcal, day){
 
 let lastSuggestedMenu = null;
 
+let selectedMenuPreference = null;
+document.querySelectorAll('.pref-chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    const pref = chip.dataset.pref;
+    if(selectedMenuPreference === pref){
+      selectedMenuPreference = null;
+      chip.classList.remove('active');
+    } else {
+      document.querySelectorAll('.pref-chip').forEach(c => c.classList.remove('active'));
+      selectedMenuPreference = pref;
+      chip.classList.add('active');
+    }
+  });
+});
+
 document.getElementById('menuSuggestBtn').addEventListener('click', ()=>{
   const day = getDayData(currentOffset);
   const burnTotal = day.activities.reduce((s,a)=>s+a.burn, 0);
   const targetKcal = (day.goal + burnTotal) || 1800;
-  const menu = buildMenu(targetKcal, day);
+  const menu = buildMenu(targetKcal, day, selectedMenuPreference);
   lastSuggestedMenu = menu;
 
   const mealsHtml = MEAL_SLOTS.filter(m => menu.meals[m]).map(mealTitle => `
