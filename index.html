@@ -312,7 +312,7 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .log-item .li-qty{font-size:11px;color:var(--ink-soft);margin-top:1px;}
 .log-item .li-kcal{font-weight:700;white-space:nowrap;font-family:var(--font-mono);font-size:14px;}
 .log-item .li-del{background:var(--cream);border:none;color:var(--paprika);width:34px;height:34px;border-radius:var(--radius-sm);font-size:15px;flex-shrink:0;}
-.log-item .li-dup{background:var(--cream);border:none;color:var(--herb);width:34px;height:34px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;flex-shrink:0;}
+.log-item .li-edit{background:var(--cream);border:none;color:var(--herb);width:34px;height:34px;border-radius:var(--radius-sm);font-size:15px;flex-shrink:0;}
 .log-empty{text-align:center;padding:32px 10px;color:var(--ink-soft);font-size:13px;}
 .receipt-total{
   display:flex;justify-content:space-between;align-items:center;padding:14px 0 12px;
@@ -840,6 +840,28 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
   </div>
 </div>
 
+<!-- Edit log item quantity sheet -->
+<div class="overlay hidden" id="editQtyOverlay">
+  <div class="sheet">
+    <h3 id="editQtyName">שם המזון</h3>
+    <div class="meta" id="editQtyMeta">כמות מקורית</div>
+    <div class="qty-row">
+      <button id="editQtyMinus" aria-label="הפחת">−</button>
+      <input type="number" id="editQtyInput" value="1" min="0.25" step="0.25" inputmode="decimal">
+      <span class="qty-unit">מכפיל</span>
+      <button id="editQtyPlus" aria-label="הוסף">+</button>
+    </div>
+    <div class="preview">
+      <span>ערך תזונתי מעודכן:</span>
+      <span><b id="editQtyKcalPreview">0</b> קק"ל</span>
+    </div>
+    <div class="sheet-buttons">
+      <button class="btn-cancel" id="editQtyCancel">ביטול</button>
+      <button class="btn-confirm" id="editQtySave">שמור</button>
+    </div>
+  </div>
+</div>
+
 <!-- Custom food sheet -->
 <div class="overlay hidden" id="customOverlay">
   <div class="sheet">
@@ -1347,17 +1369,13 @@ function render(){
           <div class="li-qty">${item.qtyLabel}</div>
         </div>
         <div class="li-kcal">${Math.round(item.kcal)} קק"ל</div>
-        <button class="li-dup" data-idx="${idx}" title="הכפל כמות">×2</button>
+        <button class="li-edit" data-idx="${idx}" title="ערוך כמות">✎</button>
         <button class="li-del" data-idx="${idx}" title="מחק">✕</button>
       </div>
     `).join('');
-    logList.querySelectorAll('.li-dup').forEach(btn=>{
+    logList.querySelectorAll('.li-edit').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        const idx = parseInt(btn.dataset.idx);
-        const item = day.log[idx];
-        day.log.splice(idx+1, 0, { name:item.name, qtyLabel:item.qtyLabel, kcal:item.kcal, p:item.p, c:item.c, f:item.f });
-        saveAll(allData);
-        render();
+        openEditLogItem(parseInt(btn.dataset.idx));
       });
     });
     logList.querySelectorAll('.li-del').forEach(btn=>{
@@ -2027,6 +2045,64 @@ document.getElementById('qtyConfirm').addEventListener('click', ()=>{
   qtyOverlay.classList.add('hidden');
   searchInput.value = '';
   resultsBox.innerHTML = '';
+  render();
+});
+
+// ---------- Edit existing log item quantity ----------
+const editQtyOverlay = document.getElementById('editQtyOverlay');
+const editQtyInput = document.getElementById('editQtyInput');
+let editingLogIdx = null;
+
+function openEditLogItem(idx){
+  const day = getDayData(currentOffset);
+  const item = day.log[idx];
+  if(!item) return;
+  if(item.baseKcal == null){
+    item.baseKcal = item.kcal;
+    item.baseP = item.p;
+    item.baseC = item.c;
+    item.baseF = item.f;
+    item.baseQtyLabel = item.qtyLabel;
+    item.qtyMultiplier = item.qtyMultiplier || 1;
+  }
+  editingLogIdx = idx;
+  document.getElementById('editQtyName').textContent = item.name;
+  document.getElementById('editQtyMeta').textContent = `כמות מקורית: ${item.baseQtyLabel} · ${Math.round(item.baseKcal)} קק"ל`;
+  editQtyInput.value = item.qtyMultiplier;
+  updateEditQtyPreview();
+  editQtyOverlay.classList.remove('hidden');
+}
+
+function updateEditQtyPreview(){
+  const day = getDayData(currentOffset);
+  const item = day.log[editingLogIdx];
+  if(!item) return;
+  const mult = parseFloat(editQtyInput.value) || 0;
+  document.getElementById('editQtyKcalPreview').textContent = Math.round(item.baseKcal * mult);
+}
+editQtyInput.addEventListener('input', updateEditQtyPreview);
+document.getElementById('editQtyMinus').addEventListener('click', ()=>{
+  editQtyInput.value = Math.max(0.25, (parseFloat(editQtyInput.value)||0) - 0.25);
+  updateEditQtyPreview();
+});
+document.getElementById('editQtyPlus').addEventListener('click', ()=>{
+  editQtyInput.value = (parseFloat(editQtyInput.value)||0) + 0.25;
+  updateEditQtyPreview();
+});
+document.getElementById('editQtyCancel').addEventListener('click', ()=> editQtyOverlay.classList.add('hidden'));
+document.getElementById('editQtySave').addEventListener('click', ()=>{
+  const day = getDayData(currentOffset);
+  const item = day.log[editingLogIdx];
+  if(!item) return;
+  const mult = Math.max(0.25, parseFloat(editQtyInput.value) || 1);
+  item.qtyMultiplier = mult;
+  item.kcal = item.baseKcal * mult;
+  item.p = item.baseP * mult;
+  item.c = item.baseC * mult;
+  item.f = item.baseF * mult;
+  item.qtyLabel = mult === 1 ? item.baseQtyLabel : `${item.baseQtyLabel} (×${mult})`;
+  saveAll(allData);
+  editQtyOverlay.classList.add('hidden');
   render();
 });
 
