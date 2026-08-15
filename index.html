@@ -242,6 +242,18 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .craving-card .cc-note{font-size:12px;color:var(--ink-soft);margin-top:6px;line-height:1.4;}
 .craving-card button{margin-top:var(--space-3);width:100%;}
 
+/* ---------- AI consultation ---------- */
+.ai-question-box{
+  width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--radius-sm);
+  font-family:inherit;font-size:15px;background:var(--cream);color:var(--ink);resize:vertical;min-height:70px;
+}
+.ai-question-box:focus{border-color:var(--herb);outline:none;background:#fff;}
+.ai-answer{
+  margin-top:var(--space-3);background:var(--cream);border-radius:var(--radius-sm);
+  padding:14px 16px;font-size:13.5px;line-height:1.7;white-space:pre-wrap;
+}
+.ai-answer-loading{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-4) var(--space-1);font-size:13px;color:var(--ink-soft);font-weight:500;}
+
 /* ---------- Menu anchors ---------- */
 .anchor-box{background:var(--cream);border-radius:var(--radius-sm);padding:var(--space-3);margin-bottom:var(--space-3);}
 .anchor-title{font-size:12.5px;font-weight:700;margin-bottom:8px;}
@@ -726,6 +738,14 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
 
         <button class="calc-btn" id="menuSuggestBtn">הצע לי תפריט להיום</button>
         <div id="menuSuggestion" style="margin-top:var(--space-3);"></div>
+      </div>
+
+      <div class="card">
+        <h2>🤖 התייעצות עם AI</h2>
+        <div class="bmi-hint" style="margin-bottom:var(--space-3);">שאל שאלה חופשית על התזונה שלך היום — למשל "מה כדאי לי לאכול הערב אם נשארו לי 300 קלוריות ולא בא לי עוף?"</div>
+        <textarea id="aiQuestion" class="ai-question-box" placeholder="כתוב כאן את השאלה שלך..." rows="3"></textarea>
+        <button class="calc-btn" id="aiAskBtn" style="margin-top:var(--space-2);">שאל</button>
+        <div id="aiAnswerWrap"></div>
       </div>
 
       <div class="card">
@@ -1973,6 +1993,52 @@ function showCraving(list){
 }
 document.getElementById('cravingSweetBtn').addEventListener('click', ()=> showCraving(CRAVING_SWEET));
 document.getElementById('cravingSaltyBtn').addEventListener('click', ()=> showCraving(CRAVING_SALTY));
+
+// ---------- AI consultation ----------
+document.getElementById('aiAskBtn').addEventListener('click', async ()=>{
+  const questionInput = document.getElementById('aiQuestion');
+  const question = questionInput.value.trim();
+  const answerWrap = document.getElementById('aiAnswerWrap');
+  if(!question){
+    alert('נא לכתוב שאלה קודם');
+    return;
+  }
+
+  const day = getDayData(currentOffset);
+  const burnTotal = day.activities.reduce((s,a)=>s+a.burn, 0);
+  const consumedKcal = (day.log||[]).reduce((s,i)=>s+i.kcal, 0);
+  const goal = Math.round((day.goal||0) + burnTotal);
+  const remaining = Math.round(goal - consumedKcal);
+  const eaten = (day.log||[]).map(i=>i.name);
+  const anchors = Object.keys(day.anchors||{}).map(m => `${m}: ${day.anchors[m].name}`);
+
+  answerWrap.innerHTML = '<div class="ai-answer-loading"><div class="spinner"></div>חושב על תשובה...</div>';
+
+  try{
+    const response = await fetch("/.netlify/functions/ask-nutrition", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question,
+        context: { goal, consumed: Math.round(consumedKcal), remaining, eaten, anchors }
+      })
+    });
+    const data = await response.json();
+    if(!response.ok){
+      throw new Error(data?.error || 'API request failed');
+    }
+    answerWrap.innerHTML = `<div class="ai-answer">${escapeHtml(data.text || '')}</div>`;
+  }catch(err){
+    console.error(err);
+    if(/load failed|failed to fetch|networkerror/i.test(err.message || '')){
+      answerWrap.innerHTML = `<div class="ai-answer">לא הצלחתי להתחבר לשרת ההתייעצות. נסה שוב בעוד רגע.</div>`;
+    } else if(/high demand|overloaded/i.test(err.message || '')){
+      answerWrap.innerHTML = `<div class="ai-answer">השרת של Gemini עמוס כרגע — נסה שוב בעוד דקה.</div>`;
+    } else {
+      answerWrap.innerHTML = `<div class="ai-answer">אירעה שגיאה: ${escapeHtml(err.message || String(err))}</div>`;
+    }
+  }
+});
 
 // ---------- Search ----------
 const searchInput = document.getElementById('foodSearch');
