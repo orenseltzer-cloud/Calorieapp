@@ -677,6 +677,13 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
       </div>
 
       <div class="card">
+        <h2>🔍 ניתוח AI יומי</h2>
+        <div class="bmi-hint" style="margin-bottom:var(--space-3);">מה איכות המזון שאכלת היום? חסר חלבון? יותר מדי מעובד? תן ל-AI לנתח.</div>
+        <button class="calc-btn" id="analyzeDayBtn">נתח לי את היום</button>
+        <div id="dayAnalysisWrap"></div>
+      </div>
+
+      <div class="card">
         <h2>הרגלים יומיים</h2>
         <div class="water-counter">
           <div class="water-info">
@@ -2083,6 +2090,54 @@ document.getElementById('aiAskBtn').addEventListener('click', async ()=>{
       answerWrap.innerHTML = `<div class="ai-answer">השרת של Gemini עמוס כרגע — נסה שוב בעוד דקה.</div>`;
     } else {
       answerWrap.innerHTML = `<div class="ai-answer">אירעה שגיאה: ${escapeHtml(err.message || String(err))}</div>`;
+    }
+  }
+});
+
+// ---------- Daily AI nutrition analysis ----------
+document.getElementById('analyzeDayBtn').addEventListener('click', async ()=>{
+  const wrap = document.getElementById('dayAnalysisWrap');
+  const day = getDayData(currentOffset);
+  if(!day.log || day.log.length === 0){
+    alert('עוד לא הוספת מזון היום — אין מה לנתח');
+    return;
+  }
+  const burnTotal = day.activities.reduce((s,a)=>s+a.burn, 0);
+  const adjustedGoal = day.goal + burnTotal;
+  const totals = day.log.reduce((acc,item)=>{
+    acc.kcal += item.kcal; acc.p += item.p; acc.c += item.c; acc.f += item.f;
+    return acc;
+  }, {kcal:0,p:0,c:0,f:0});
+  const weightKg = parseFloat(bmiData.weight) || null;
+  const proteinGoal = weightKg ? Math.round(weightKg * 1.8) : Math.round((adjustedGoal * 0.30) / 4);
+  const fatGoal = Math.round((adjustedGoal * 0.25) / 9);
+  const carbGoal = Math.max(0, Math.round((adjustedGoal - proteinGoal*4 - fatGoal*9) / 4));
+
+  wrap.innerHTML = '<div class="ai-answer-loading"><div class="spinner"></div>מנתח את היום שלך...</div>';
+
+  try{
+    const response = await fetch("/.netlify/functions/analyze-day", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: day.log.map(i => ({ name: i.name, qtyLabel: i.qtyLabel, kcal: i.kcal })),
+        totals,
+        goals: { kcalGoal: Math.round(adjustedGoal), proteinGoal, carbGoal, fatGoal }
+      })
+    });
+    const data = await response.json();
+    if(!response.ok){
+      throw new Error(data?.error || 'API request failed');
+    }
+    wrap.innerHTML = `<div class="ai-answer">${escapeHtml(data.text || '')}</div>`;
+  }catch(err){
+    console.error(err);
+    if(/load failed|failed to fetch|networkerror/i.test(err.message || '')){
+      wrap.innerHTML = `<div class="ai-answer">לא הצלחתי להתחבר לשרת הניתוח. נסה שוב בעוד רגע.</div>`;
+    } else if(/high demand|overloaded/i.test(err.message || '')){
+      wrap.innerHTML = `<div class="ai-answer">השרת של Gemini עמוס כרגע — נסה שוב בעוד דקה.</div>`;
+    } else {
+      wrap.innerHTML = `<div class="ai-answer">אירעה שגיאה: ${escapeHtml(err.message || String(err))}</div>`;
     }
   }
 });
