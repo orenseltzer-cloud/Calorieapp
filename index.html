@@ -109,11 +109,17 @@ h1,h2,h3{margin:0;font-family:var(--font-body);}
 .quote-text{font-size:13.5px;font-weight:600;line-height:1.5;}
 .macro-row{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-2);margin-top:var(--space-4);}
 .macro-chip{background:var(--cream);border-radius:var(--radius-sm);padding:var(--space-2) 4px;text-align:center;}
-.macro-chip .v{font-family:var(--font-mono);font-size:16px;font-weight:700;}
+.macro-chip .v{font-family:var(--font-mono);font-size:15px;font-weight:700;}
+.macro-chip .mc-goal{font-size:10.5px;font-weight:500;color:var(--ink-soft);}
 .macro-chip .k{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;font-weight:600;}
 .macro-chip.p .v{color:var(--paprika-dark);}
 .macro-chip.c .v{color:var(--turmeric);}
 .macro-chip.f .v{color:var(--herb);}
+.mc-track{height:5px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px;}
+.mc-fill{height:100%;border-radius:4px;transition:width .4s ease;}
+.macro-chip.p .mc-fill{background:var(--paprika-dark);}
+.macro-chip.c .mc-fill{background:var(--turmeric);}
+.macro-chip.f .mc-fill{background:var(--herb);}
 
 /* ---------- Form controls (shared) ---------- */
 input[type=text], input[type=number], select{
@@ -174,6 +180,18 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .detected-item .di-name{font-weight:600;font-size:14px;}
 .detected-item .di-meta{font-size:11px;color:var(--ink-soft);margin-top:1px;}
 .detected-item .di-kcal{font-weight:700;font-size:14px;color:var(--paprika-dark);white-space:nowrap;font-family:var(--font-mono);}
+
+/* ---------- Meal summary (photo review) ---------- */
+.meal-summary{
+  margin-top:var(--space-3);background:var(--cream);border-radius:var(--radius-sm);
+  padding:14px 16px;
+}
+.meal-summary .ms-title{font-size:11.5px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+.meal-summary .ms-kcal{font-family:var(--font-mono);font-size:24px;font-weight:800;margin-bottom:10px;}
+.meal-summary .ms-macros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.meal-summary .ms-macro{text-align:center;}
+.meal-summary .ms-macro .v{font-family:var(--font-mono);font-size:14px;font-weight:700;}
+.meal-summary .ms-macro .k{font-size:9.5px;color:var(--ink-soft);text-transform:uppercase;margin-top:2px;}
 
 /* ---------- BMI / Goal calculator ---------- */
 .bmi-inputs{display:flex;gap:var(--space-2);margin-bottom:var(--space-3);}
@@ -628,9 +646,21 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
           <span id="pctLabel">0%</span>
         </div>
         <div class="macro-row">
-          <div class="macro-chip p"><div class="v" id="proteinTotal">0g</div><div class="k">חלבון</div></div>
-          <div class="macro-chip c"><div class="v" id="carbTotal">0g</div><div class="k">פחמימה</div></div>
-          <div class="macro-chip f"><div class="v" id="fatTotal">0g</div><div class="k">שומן</div></div>
+          <div class="macro-chip p">
+            <div class="v"><span id="proteinTotal">0</span><span class="mc-goal">/<span id="proteinGoal">0</span>g</span></div>
+            <div class="k">חלבון</div>
+            <div class="mc-track"><div class="mc-fill" id="proteinFill"></div></div>
+          </div>
+          <div class="macro-chip c">
+            <div class="v"><span id="carbTotal">0</span><span class="mc-goal">/<span id="carbGoal">0</span>g</span></div>
+            <div class="k">פחמימה</div>
+            <div class="mc-track"><div class="mc-fill" id="carbFill"></div></div>
+          </div>
+          <div class="macro-chip f">
+            <div class="v"><span id="fatTotal">0</span><span class="mc-goal">/<span id="fatGoal">0</span>g</span></div>
+            <div class="k">שומן</div>
+            <div class="mc-track"><div class="mc-fill" id="fatFill"></div></div>
+          </div>
         </div>
       </div>
 
@@ -926,6 +956,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
     <h3>זיהוי מהתמונה</h3>
     <div class="meta">סמן/י אילו פריטים להוסיף ליומן. הכמויות הן הערכה בלבד — אפשר לערוך.</div>
     <div id="detectedList"></div>
+    <div class="meal-summary" id="mealSummary"></div>
     <div class="sheet-buttons" style="margin-top:var(--space-4);">
       <button class="btn-cancel" id="photoReviewCancel">ביטול</button>
       <button class="btn-confirm" id="photoReviewConfirm">הוסף את הנבחרים</button>
@@ -1373,9 +1404,25 @@ function render(){
   document.getElementById('remainLabel').textContent = remain >= 0
     ? `נותרו ${Math.round(remain)} קק"ל`
     : `חריגה של ${Math.round(-remain)} קק"ל`;
-  document.getElementById('proteinTotal').textContent = Math.round(totals.p) + 'g';
-  document.getElementById('carbTotal').textContent = Math.round(totals.c) + 'g';
-  document.getElementById('fatTotal').textContent = Math.round(totals.f) + 'g';
+
+  // Macro targets: protein based on body weight when known (1.8g/kg — solid for weight loss
+  // while preserving muscle), fat at 25% of calories, carbs fill the remainder.
+  const weightKg = parseFloat(bmiData.weight) || null;
+  const proteinGoal = weightKg ? Math.round(weightKg * 1.8) : Math.round((adjustedGoal * 0.30) / 4);
+  const fatGoal = Math.round((adjustedGoal * 0.25) / 9);
+  const carbGoal = Math.max(0, Math.round((adjustedGoal - proteinGoal*4 - fatGoal*9) / 4));
+
+  document.getElementById('proteinTotal').textContent = Math.round(totals.p);
+  document.getElementById('proteinGoal').textContent = proteinGoal;
+  document.getElementById('proteinFill').style.width = Math.min(100, Math.round((totals.p/proteinGoal)*100) || 0) + '%';
+
+  document.getElementById('carbTotal').textContent = Math.round(totals.c);
+  document.getElementById('carbGoal').textContent = carbGoal;
+  document.getElementById('carbFill').style.width = Math.min(100, Math.round((totals.c/carbGoal)*100) || 0) + '%';
+
+  document.getElementById('fatTotal').textContent = Math.round(totals.f);
+  document.getElementById('fatGoal').textContent = fatGoal;
+  document.getElementById('fatFill').style.width = Math.min(100, Math.round((totals.f/fatGoal)*100) || 0) + '%';
 
   document.getElementById('receiptSub').textContent = dayLabelText(currentOffset) + ' · ' + day.log.length + ' פריטים';
   const logList = document.getElementById('logList');
@@ -2464,7 +2511,34 @@ function openPhotoReview(){
       <div class="di-kcal">${Math.round(it.kcal)} קק"ל</div>
     </label>
   `).join('');
+  list.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', updateMealSummary);
+  });
+  updateMealSummary();
   photoReviewOverlay.classList.remove('hidden');
+}
+
+function updateMealSummary(){
+  const checked = [...document.querySelectorAll('#detectedList input[type=checkbox]:checked')].map(cb => parseInt(cb.dataset.idx));
+  const summaryEl = document.getElementById('mealSummary');
+  if(checked.length === 0){
+    summaryEl.innerHTML = '';
+    return;
+  }
+  const totals = checked.reduce((acc, idx)=>{
+    const it = detectedItems[idx];
+    acc.kcal += it.kcal; acc.p += it.p; acc.c += it.c; acc.f += it.f;
+    return acc;
+  }, { kcal:0, p:0, c:0, f:0 });
+  summaryEl.innerHTML = `
+    <div class="ms-title">סיכום תזונתי לארוחה (${checked.length} פריטים נבחרים)</div>
+    <div class="ms-kcal">${Math.round(totals.kcal)} קק"ל</div>
+    <div class="ms-macros">
+      <div class="ms-macro"><div class="v">${Math.round(totals.p)}g</div><div class="k">חלבון</div></div>
+      <div class="ms-macro"><div class="v">${Math.round(totals.c)}g</div><div class="k">פחמימה</div></div>
+      <div class="ms-macro"><div class="v">${Math.round(totals.f)}g</div><div class="k">שומן</div></div>
+    </div>
+  `;
 }
 document.getElementById('photoReviewCancel').addEventListener('click', ()=> photoReviewOverlay.classList.add('hidden'));
 document.getElementById('photoReviewConfirm').addEventListener('click', ()=>{
