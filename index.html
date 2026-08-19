@@ -778,17 +778,21 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
 
         <div class="quick-add-title">הוספה מהירה</div>
         <div class="quick-add-grid">
-          <button class="quick-add-btn" data-food="חזה עוף מבושל">חזה עוף</button>
-          <button class="quick-add-btn" data-food="אורז לבן מבושל">אורז</button>
-          <button class="quick-add-btn" data-food="שעועית ירוקה מבושלת">שעועית ירוקה</button>
-          <button class="quick-add-btn" data-food="סלט ירקות ישראלי">סלט ירקות</button>
-          <button class="quick-add-btn" data-food="פירה תפוחי אדמה">פירה</button>
-          <button class="quick-add-btn" data-food="שניצל עוף">שניצל מטוגן</button>
-          <button class="quick-add-btn" data-food="המבורגר בלחמנייה">המבורגר</button>
-          <button class="quick-add-btn" id="quickAddEgg">ביצה מבושלת</button>
-          <button class="quick-add-btn" id="quickAddOmelette">חביתה</button>
-          <button class="quick-add-btn" data-food="בגט">בגט</button>
-          <button class="quick-add-btn" data-food="לחם מלא">לחם קמח מלא</button>
+          <button class="quick-add-btn" data-food="חזה עוף מבושל">🍗 חזה עוף</button>
+          <button class="quick-add-btn" data-food="אורז לבן מבושל">🍚 אורז</button>
+          <button class="quick-add-btn" data-food="שעועית ירוקה מבושלת">🫛 שעועית ירוקה</button>
+          <button class="quick-add-btn" data-food="סלט ירקות ישראלי">🥗 סלט ירקות</button>
+          <button class="quick-add-btn" data-food="פירה תפוחי אדמה">🥔 פירה</button>
+          <button class="quick-add-btn" data-food="שניצל עוף">🍖 שניצל מטוגן</button>
+          <button class="quick-add-btn" data-food="המבורגר בלחמנייה">🍔 המבורגר</button>
+          <button class="quick-add-btn" id="quickAddEgg">🥚 ביצה מבושלת</button>
+          <button class="quick-add-btn" id="quickAddOmelette">🍳 חביתה</button>
+          <button class="quick-add-btn" data-food="בגט">🥖 בגט</button>
+          <button class="quick-add-btn" data-food="לחם מלא">🍞 לחם קמח מלא</button>
+          <button class="quick-add-btn" data-food="קפה אספרסו">☕ אספרסו</button>
+          <button class="quick-add-btn" data-food="קפה נמס עם חלב">☕ קפה נמס עם חלב</button>
+          <button class="quick-add-btn" data-food="סלמון אפוי">🐟 סלמון</button>
+          <button class="quick-add-btn" data-food="שניצל טבעול">🌱 שניצל טבעול</button>
         </div>
 
         <div class="photo-btn-row">
@@ -1143,6 +1147,7 @@ const FOOD_DB = [
   {name:"קפה שחור",cat:"משקאות",kcal:2,p:0.3,c:0,f:0},
   {name:"קפה אספרסו",cat:"משקאות",kcal:3,p:0.3,c:0.5,f:0.1,perServing:true},
   {name:"קפה נמס עלית (כפית, ללא חלב וסוכר)",cat:"משקאות",kcal:6,p:0.3,c:1,f:0,perServing:true},
+  {name:"קפה נמס עם חלב",cat:"משקאות",kcal:90,p:4,c:6,f:5,perServing:true},
   {name:"קפה הפוך (חלב 3%)",cat:"משקאות",kcal:60,p:3,c:4.5,f:3,perServing:true},
   {name:"קולה",cat:"משקאות",kcal:42,p:0,c:10.6,f:0},
   {name:"מיץ תפוזים סחוט",cat:"משקאות",kcal:45,p:0.7,c:10.4,f:0.2},
@@ -1219,6 +1224,7 @@ const FOOD_DB = [
   {name:"סביח בפיתה",cat:"ארוחות מוכנות",kcal:520,p:14,c:60,f:25,perServing:true},
   {name:"כריך גבינה צהובה",cat:"ארוחות מוכנות",kcal:340,p:15,c:32,f:17,perServing:true},
   {name:"שניצל עוף",cat:"ארוחות מוכנות",kcal:310,p:24,c:18,f:16,perServing:true},
+  {name:"שניצל טבעול",cat:"ארוחות מוכנות",kcal:150,p:8,c:12,f:9,perServing:true},
   {name:"פסטה ברוטב עגבניות",cat:"ארוחות מוכנות",kcal:380,p:12,c:65,f:8,perServing:true},
   {name:"מרק עוף עם אטריות",cat:"ארוחות מוכנות",kcal:120,p:8,c:14,f:3,perServing:true},
   {name:"חביתה (2 ביצים)",cat:"ארוחות מוכנות",kcal:180,p:13,c:1.5,f:14,perServing:true},
@@ -1937,6 +1943,8 @@ const MENU_TEMPLATES = [
 function findFood(name){
   return FOOD_DB.find(f => f.name === name);
 }
+
+// ---------- Recipes ----------
 
 const MEAL_SLOTS = ["ארוחת בוקר","ארוחת צהריים","ארוחת ערב","נשנוש"];
 const MEAL_WEIGHTS = {"ארוחת בוקר":0.25,"ארוחת צהריים":0.35,"ארוחת ערב":0.30,"נשנוש":0.10};
@@ -2816,6 +2824,17 @@ function closeBarcodeScanner(){
   barcodeOverlay.classList.add('hidden');
 }
 
+function parseGramsFromQuantity(qtyStr){
+  if(!qtyStr) return null;
+  const match = String(qtyStr).match(/([\d.,]+)\s*(kg|ק"ג|קג|g|גרם)/i);
+  if(!match) return null;
+  let num = parseFloat(match[1].replace(',', '.'));
+  if(isNaN(num)) return null;
+  const unit = match[2].toLowerCase();
+  if(unit.includes('kg') || unit.includes('ק')) num *= 1000;
+  return num;
+}
+
 async function lookupBarcode(barcode){
   closeBarcodeScanner();
   barcodeStatus.textContent = '';
@@ -2831,17 +2850,39 @@ async function lookupBarcode(barcode){
     }
     const p = data.product;
     const n = p.nutriments || {};
-    const kcal = n['energy-kcal_100g'] ?? n['energy-kcal'] ?? null;
-    if(kcal == null){
-      alert('נמצא המוצר, אך אין נתוני קלוריות זמינים עבורו. אפשר להוסיף ידנית.');
+
+    // Prefer the explicit "per 100g" fields — this is the correct, standard basis.
+    let kcal100 = n['energy-kcal_100g'];
+    let protein100 = n['proteins_100g'];
+    let carbs100 = n['carbohydrates_100g'];
+    let fat100 = n['fat_100g'];
+
+    // Fallback: some products only list totals for the whole package.
+    // In that case, compute "total calories ÷ package weight × 100" to get true per-100g values.
+    if(kcal100 == null){
+      const totalKcal = n['energy-kcal'] ?? n['energy-kcal_serving'];
+      const totalGrams = (typeof p.product_quantity === 'number' ? p.product_quantity : null)
+        || parseGramsFromQuantity(p.product_quantity)
+        || parseGramsFromQuantity(p.quantity);
+      if(totalKcal != null && totalGrams){
+        const ratio = 100 / totalGrams;
+        kcal100 = totalKcal * ratio;
+        if(protein100 == null && n['proteins'] != null) protein100 = n['proteins'] * ratio;
+        if(carbs100 == null && n['carbohydrates'] != null) carbs100 = n['carbohydrates'] * ratio;
+        if(fat100 == null && n['fat'] != null) fat100 = n['fat'] * ratio;
+      }
+    }
+
+    if(kcal100 == null){
+      alert('נמצא המוצר, אך אין מספיק נתונים (קלוריות ומשקל אריזה) כדי לחשב ערך ל-100 גרם. אפשר להוסיף ידנית.');
       return;
     }
     const food = {
       name: p.product_name_he || p.product_name || p.generic_name_he || p.generic_name || 'מוצר סרוק',
-      kcal: kcal,
-      p: n['proteins_100g'] ?? 0,
-      c: n['carbohydrates_100g'] ?? 0,
-      f: n['fat_100g'] ?? 0
+      kcal: kcal100,
+      p: protein100 ?? 0,
+      c: carbs100 ?? 0,
+      f: fat100 ?? 0
     };
     openQtySheet(food);
   }catch(err){
