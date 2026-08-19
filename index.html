@@ -402,6 +402,42 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 
 footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--space-5) var(--space-3) 0;line-height:1.6;}
 
+/* ---------- Milestone celebration ---------- */
+.milestone-overlay{
+  position:fixed;inset:0;background:rgba(43,38,32,.55);z-index:70;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.milestone-overlay.hidden{display:none;}
+.milestone-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.confetti-piece{
+  position:absolute;top:-10%;font-size:22px;will-change:transform,opacity;
+  animation:confettiFall linear forwards;
+}
+@keyframes confettiFall{
+  0%{ transform:translateY(0) translateX(0) rotate(0deg); opacity:1; }
+  100%{ transform:translateY(115vh) translateX(var(--drift,0px)) rotate(var(--spin,360deg)); opacity:.9; }
+}
+.milestone-card{
+  position:relative;background:var(--card);border-radius:24px;padding:32px 26px;
+  max-width:320px;width:88%;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.25);
+  animation:milestonePop .45s cubic-bezier(.2,.9,.3,1.3);
+}
+@keyframes milestonePop{
+  0%{ transform:scale(.6); opacity:0; }
+  100%{ transform:scale(1); opacity:1; }
+}
+.milestone-emoji{font-size:52px;margin-bottom:10px;}
+.milestone-title{font-family:var(--font-display);font-size:24px;color:var(--ink);margin-bottom:6px;}
+.milestone-sub{font-size:14px;color:var(--ink-soft);line-height:1.5;margin-bottom:20px;}
+.milestone-close{
+  width:100%;padding:13px;border:none;border-radius:var(--radius-sm);
+  background:var(--herb);color:#fff;font-family:inherit;font-size:14px;font-weight:700;min-height:46px;
+}
+.milestone-close:active{background:var(--herb-dark);}
+.milestone-card.big{background:linear-gradient(160deg, var(--turmeric), var(--paprika));}
+.milestone-card.big .milestone-title, .milestone-card.big .milestone-sub{color:#fff;}
+.milestone-card.big .milestone-close{background:#fff;color:var(--paprika-dark);}
+
 /* ---------- Barcode scanner ---------- */
 .barcode-btn{
   display:flex;align-items:center;justify-content:center;gap:6px;width:100%;
@@ -1018,6 +1054,17 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
       <input type="text" id="barcodeManualInput" placeholder="מספר ברקוד" inputmode="numeric">
       <button id="barcodeManualBtn" style="flex:0 0 auto;padding:10px 16px;border:none;border-radius:var(--radius-sm);background:var(--herb);color:#fff;font-family:inherit;font-weight:700;">חפש</button>
     </div>
+  </div>
+</div>
+
+<!-- Milestone celebration overlay -->
+<div class="milestone-overlay hidden" id="milestoneOverlay">
+  <div class="milestone-confetti" id="milestoneConfetti"></div>
+  <div class="milestone-card" id="milestoneCard">
+    <div class="milestone-emoji" id="milestoneEmoji">🎉</div>
+    <div class="milestone-title" id="milestoneTitle">כל הכבוד!</div>
+    <div class="milestone-sub" id="milestoneSub"></div>
+    <button class="milestone-close" id="milestoneCloseBtn">המשך</button>
   </div>
 </div>
 
@@ -1714,6 +1761,60 @@ document.getElementById('weightSaveBtn').addEventListener('click', ()=>{
   saveAll(allData);
   render();
   showWeightFeedback(val, previousEntry, isFirstEver);
+  checkWeightMilestone(val);
+});
+
+function checkWeightMilestone(newVal){
+  const starting = parseFloat(bmiData.startingWeight);
+  if(isNaN(starting)) return;
+  const totalLoss = starting - newVal;
+  if(totalLoss <= 0) return;
+  const wholeKgReached = Math.floor(totalLoss);
+  const lastCelebrated = bmiData.lastMilestoneKg || 0;
+  if(wholeKgReached <= lastCelebrated) return;
+
+  bmiData.lastMilestoneKg = wholeKgReached;
+  saveBmi(bmiData);
+
+  const isBigMilestone = wholeKgReached % 5 === 0;
+  celebrateMilestone(wholeKgReached, isBigMilestone);
+}
+
+function celebrateMilestone(kg, isBig){
+  const overlay = document.getElementById('milestoneOverlay');
+  const card = document.getElementById('milestoneCard');
+  const emoji = document.getElementById('milestoneEmoji');
+  const title = document.getElementById('milestoneTitle');
+  const sub = document.getElementById('milestoneSub');
+  const confettiWrap = document.getElementById('milestoneConfetti');
+
+  card.className = 'milestone-card' + (isBig ? ' big' : '');
+  emoji.textContent = isBig ? '🏆' : '🎉';
+  title.textContent = isBig ? `${kg} ק"ג ירדו!` : `עוד ק"ג למטה!`;
+  sub.textContent = isBig
+    ? `אבן דרך משמעותית — ${kg} ק"ג ירידה מההתחלה. זו התמדה אמיתית!`
+    : `סה"כ ${kg} ק"ג ירידה מהמשקל ההתחלתי שלך. כל קילו נחשב 💪`;
+
+  const pieces = ['🎉','✨','🎊','⭐','💪','🥳'];
+  const count = isBig ? 36 : 20;
+  confettiWrap.innerHTML = '';
+  for(let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.textContent = pieces[Math.floor(Math.random()*pieces.length)];
+    el.style.left = (Math.random()*100) + 'vw';
+    el.style.setProperty('--drift', (Math.random()*160-80) + 'px');
+    el.style.setProperty('--spin', (Math.random()*720-360) + 'deg');
+    el.style.animationDuration = (2.2 + Math.random()*1.6) + 's';
+    el.style.animationDelay = (Math.random()*0.5) + 's';
+    el.style.fontSize = (16 + Math.random()*14) + 'px';
+    confettiWrap.appendChild(el);
+  }
+
+  overlay.classList.remove('hidden');
+}
+document.getElementById('milestoneCloseBtn').addEventListener('click', ()=>{
+  document.getElementById('milestoneOverlay').classList.add('hidden');
 });
 
 function showWeightFeedback(newVal, previousEntry, isFirstEver){
