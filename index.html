@@ -2797,20 +2797,18 @@ async function openBarcodeScanner(){
   }
   try{
     barcodeReader = new ZXing.BrowserMultiFormatReader();
-    let deviceId;
-    try{
-      const devices = await barcodeReader.listVideoInputDevices();
-      const backCam = devices.find(d => /back|rear|environment/i.test(d.label)) || devices[devices.length-1];
-      deviceId = backCam ? backCam.deviceId : undefined;
-    }catch(listErr){
-      console.warn('Could not list video devices, falling back to default camera', listErr);
-    }
     barcodeStatus.textContent = 'כוון את הברקוד למסגרת';
-    barcodeReader.decodeFromVideoDevice(deviceId, barcodeVideo, (result, err)=>{
-      if(result){
-        lookupBarcode(result.getText());
+    // Explicitly request the rear/environment-facing camera every time — more reliable
+    // than matching device labels, which can behave inconsistently on repeat scans.
+    await barcodeReader.decodeFromConstraints(
+      { audio: false, video: { facingMode: { ideal: 'environment' } } },
+      barcodeVideo,
+      (result, err)=>{
+        if(result){
+          lookupBarcode(result.getText());
+        }
       }
-    });
+    );
   }catch(err){
     console.error(err);
     barcodeStatus.textContent = 'לא ניתן לגשת למצלמה. אפשר להזין ברקוד ידנית למטה.';
@@ -2820,6 +2818,14 @@ async function openBarcodeScanner(){
 function closeBarcodeScanner(){
   try{
     if(barcodeReader){ barcodeReader.reset(); barcodeReader = null; }
+  }catch(e){}
+  // Fully release the camera stream/tracks so the next scan starts fresh.
+  try{
+    const stream = barcodeVideo.srcObject;
+    if(stream && stream.getTracks){
+      stream.getTracks().forEach(track => track.stop());
+    }
+    barcodeVideo.srcObject = null;
   }catch(e){}
   barcodeOverlay.classList.add('hidden');
 }
