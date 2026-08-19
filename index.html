@@ -2688,10 +2688,14 @@ async function openBarcodeScanner(){
   }
   try{
     barcodeReader = new ZXing.BrowserMultiFormatReader();
-    const devices = await ZXing.BrowserCodeReader.listVideoInputDevices();
-    // Prefer the back/environment camera when available
-    const backCam = devices.find(d => /back|rear|environment/i.test(d.label)) || devices[devices.length-1];
-    const deviceId = backCam ? backCam.deviceId : undefined;
+    let deviceId;
+    try{
+      const devices = await barcodeReader.listVideoInputDevices();
+      const backCam = devices.find(d => /back|rear|environment/i.test(d.label)) || devices[devices.length-1];
+      deviceId = backCam ? backCam.deviceId : undefined;
+    }catch(listErr){
+      console.warn('Could not list video devices, falling back to default camera', listErr);
+    }
     barcodeStatus.textContent = 'כוון את הברקוד למסגרת';
     barcodeReader.decodeFromVideoDevice(deviceId, barcodeVideo, (result, err)=>{
       if(result){
