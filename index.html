@@ -402,6 +402,33 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 
 footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--space-5) var(--space-3) 0;line-height:1.6;}
 
+/* ---------- Barcode scanner ---------- */
+.barcode-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;width:100%;
+  padding:13px 6px;background:var(--turmeric);color:#fff;border:none;border-radius:var(--radius-sm);
+  font-family:inherit;font-size:13px;font-weight:700;min-height:48px;
+}
+.barcode-btn:active{background:#a56f22;}
+.barcode-overlay{
+  position:fixed;inset:0;background:#000;z-index:60;display:flex;flex-direction:column;
+}
+.barcode-overlay.hidden{display:none;}
+.barcode-header{
+  display:flex;align-items:center;justify-content:space-between;padding:calc(var(--space-3) + env(safe-area-inset-top)) var(--space-4) var(--space-3);
+  color:#fff;font-weight:700;font-size:15px;
+}
+.barcode-header button{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:16px;}
+.barcode-video-wrap{position:relative;flex:1;overflow:hidden;background:#000;}
+.barcode-video-wrap video{width:100%;height:100%;object-fit:cover;}
+.barcode-frame{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:78%;max-width:340px;height:120px;border:3px solid var(--turmeric);border-radius:12px;
+  box-shadow:0 0 0 2000px rgba(0,0,0,.45);
+}
+.barcode-status{color:#fff;text-align:center;padding:var(--space-3);font-size:13px;min-height:20px;}
+.barcode-manual{background:#fff;padding:var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;}
+.barcode-manual .field-row input{flex:1;}
+
 /* ---------- User badge ---------- */
 .header-right{text-align:left;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
 .user-badge{
@@ -736,6 +763,9 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
         <input type="file" id="photoInputCamera" accept="image/*" capture="environment" style="display:none;">
         <input type="file" id="photoInputGallery" accept="image/*" style="display:none;">
         <div id="photoStatus"></div>
+
+        <button class="barcode-btn" id="barcodeBtn" style="margin-top:var(--space-3);">📊 סרוק ברקוד מוצר</button>
+        <div class="bmi-hint" style="margin-top:6px;">נתונים אמיתיים מהאריזה — דרך מאגר Open Food Facts, ללא צורך ב-AI</div>
       </div>
 
       <div class="card">
@@ -971,6 +1001,27 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
   </div>
 </div>
 
+<!-- Barcode scanner overlay -->
+<div class="barcode-overlay hidden" id="barcodeOverlay">
+  <div class="barcode-header">
+    <span>סרוק ברקוד מוצר</span>
+    <button id="barcodeClose" aria-label="סגור">✕</button>
+  </div>
+  <div class="barcode-video-wrap">
+    <video id="barcodeVideo" playsinline></video>
+    <div class="barcode-frame"></div>
+  </div>
+  <div class="barcode-status" id="barcodeStatus">מבקש הרשאת מצלמה...</div>
+  <div class="barcode-manual">
+    <div class="bmi-hint" style="text-align:center;margin-bottom:8px;">או הזן ידנית את מספר הברקוד</div>
+    <div class="field-row">
+      <input type="text" id="barcodeManualInput" placeholder="מספר ברקוד" inputmode="numeric">
+      <button id="barcodeManualBtn" style="flex:0 0 auto;padding:10px 16px;border:none;border-radius:var(--radius-sm);background:var(--herb);color:#fff;font-family:inherit;font-weight:700;">חפש</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js"></script>
 <script>
 // ---------- Food database (per 100g) ----------
 const FOOD_DB = [
@@ -2612,6 +2663,88 @@ document.getElementById('photoReviewConfirm').addEventListener('click', ()=>{
   photoReviewOverlay.classList.add('hidden');
   render();
 });
+
+// ---------- Barcode scanner ----------
+const barcodeOverlay = document.getElementById('barcodeOverlay');
+const barcodeVideo = document.getElementById('barcodeVideo');
+const barcodeStatus = document.getElementById('barcodeStatus');
+let barcodeReader = null;
+let barcodeStream = null;
+
+document.getElementById('barcodeBtn').addEventListener('click', openBarcodeScanner);
+document.getElementById('barcodeClose').addEventListener('click', closeBarcodeScanner);
+document.getElementById('barcodeManualBtn').addEventListener('click', ()=>{
+  const val = document.getElementById('barcodeManualInput').value.trim();
+  if(!val){ alert('נא להזין מספר ברקוד'); return; }
+  lookupBarcode(val);
+});
+
+async function openBarcodeScanner(){
+  barcodeOverlay.classList.remove('hidden');
+  barcodeStatus.textContent = 'מבקש הרשאת מצלמה...';
+  if(typeof ZXing === 'undefined'){
+    barcodeStatus.textContent = 'לא הצלחתי לטעון את כלי הסריקה. השתמש בהזנה ידנית למטה.';
+    return;
+  }
+  try{
+    barcodeReader = new ZXing.BrowserMultiFormatReader();
+    const devices = await ZXing.BrowserCodeReader.listVideoInputDevices();
+    // Prefer the back/environment camera when available
+    const backCam = devices.find(d => /back|rear|environment/i.test(d.label)) || devices[devices.length-1];
+    const deviceId = backCam ? backCam.deviceId : undefined;
+    barcodeStatus.textContent = 'כוון את הברקוד למסגרת';
+    barcodeReader.decodeFromVideoDevice(deviceId, barcodeVideo, (result, err)=>{
+      if(result){
+        lookupBarcode(result.getText());
+      }
+    });
+  }catch(err){
+    console.error(err);
+    barcodeStatus.textContent = 'לא ניתן לגשת למצלמה. אפשר להזין ברקוד ידנית למטה.';
+  }
+}
+
+function closeBarcodeScanner(){
+  try{
+    if(barcodeReader){ barcodeReader.reset(); barcodeReader = null; }
+  }catch(e){}
+  barcodeOverlay.classList.add('hidden');
+}
+
+async function lookupBarcode(barcode){
+  closeBarcodeScanner();
+  barcodeStatus.textContent = '';
+  document.getElementById('barcodeManualInput').value = '';
+  photoStatus.innerHTML = '<div class="analyzing"><div class="spinner"></div>מחפש את המוצר...</div>';
+  try{
+    const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`);
+    const data = await res.json();
+    photoStatus.innerHTML = '';
+    if(data.status !== 1 || !data.product){
+      alert('המוצר לא נמצא במאגר. אפשר להוסיף אותו ידנית דרך "מזון מותאם אישית".');
+      return;
+    }
+    const p = data.product;
+    const n = p.nutriments || {};
+    const kcal = n['energy-kcal_100g'] ?? n['energy-kcal'] ?? null;
+    if(kcal == null){
+      alert('נמצא המוצר, אך אין נתוני קלוריות זמינים עבורו. אפשר להוסיף ידנית.');
+      return;
+    }
+    const food = {
+      name: p.product_name_he || p.product_name || p.generic_name_he || p.generic_name || 'מוצר סרוק',
+      kcal: kcal,
+      p: n['proteins_100g'] ?? 0,
+      c: n['carbohydrates_100g'] ?? 0,
+      f: n['fat_100g'] ?? 0
+    };
+    openQtySheet(food);
+  }catch(err){
+    photoStatus.innerHTML = '';
+    console.error(err);
+    alert('אירעה שגיאה בחיפוש המוצר. נסה שוב.');
+  }
+}
 
 // ---------- Tab bar + swipeable pager ----------
 (function initPager(){
