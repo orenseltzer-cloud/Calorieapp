@@ -108,6 +108,7 @@ h1,h2,h3{margin:0;font-family:var(--font-body);}
 .quote-icon{font-size:22px;flex-shrink:0;}
 .quote-text{font-size:13.5px;font-weight:600;line-height:1.5;}
 .macro-row{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-2);margin-top:var(--space-4);}
+.macro-row-4{grid-template-columns:repeat(2,1fr);}
 .macro-chip{background:var(--cream);border-radius:var(--radius-sm);padding:var(--space-2) 4px;text-align:center;}
 .macro-chip .v{font-family:var(--font-mono);font-size:15px;font-weight:700;}
 .macro-chip .mc-goal{font-size:10.5px;font-weight:500;color:var(--ink-soft);}
@@ -115,11 +116,13 @@ h1,h2,h3{margin:0;font-family:var(--font-body);}
 .macro-chip.p .v{color:var(--paprika-dark);}
 .macro-chip.c .v{color:var(--turmeric);}
 .macro-chip.f .v{color:var(--herb);}
+.macro-chip.fi .v{color:#6B4F9E;}
 .mc-track{height:5px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px;}
 .mc-fill{height:100%;border-radius:4px;transition:width .4s ease;}
 .macro-chip.p .mc-fill{background:var(--paprika-dark);}
 .macro-chip.c .mc-fill{background:var(--turmeric);}
 .macro-chip.f .mc-fill{background:var(--herb);}
+.macro-chip.fi .mc-fill{background:#6B4F9E;}
 
 /* ---------- Form controls (shared) ---------- */
 input[type=text], input[type=number], select{
@@ -134,6 +137,13 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 
 /* ---------- Search ---------- */
 .search-row{position:relative;}
+.search-row input{padding-left:44px;}
+.voice-btn{
+  position:absolute;top:6px;left:6px;width:34px;height:34px;border:none;border-radius:50%;
+  background:var(--cream-deep);color:var(--ink);font-size:15px;display:flex;align-items:center;justify-content:center;
+}
+.voice-btn.listening{background:var(--paprika);color:#fff;animation:voicePulse 1s ease-in-out infinite;}
+@keyframes voicePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
 .results{margin-top:var(--space-2);max-height:260px;overflow-y:auto;border-radius:var(--radius-sm);}
 .result-item{
   display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);
@@ -188,7 +198,7 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 }
 .meal-summary .ms-title{font-size:11.5px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
 .meal-summary .ms-kcal{font-family:var(--font-mono);font-size:24px;font-weight:800;margin-bottom:10px;}
-.meal-summary .ms-macros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.meal-summary .ms-macros{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
 .meal-summary .ms-macro{text-align:center;}
 .meal-summary .ms-macro .v{font-family:var(--font-mono);font-size:14px;font-weight:700;}
 .meal-summary .ms-macro .k{font-size:9.5px;color:var(--ink-soft);text-transform:uppercase;margin-top:2px;}
@@ -302,6 +312,15 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .use-goal-btn{width:100%;margin-top:var(--space-3);padding:12px;border:none;border-radius:var(--radius-sm);background:var(--herb);color:#fff;font-family:inherit;font-size:13px;font-weight:700;min-height:46px;}
 .use-goal-btn:active{background:var(--herb-dark);}
 
+/* ---------- Achievement badges ---------- */
+.badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.badge-item{text-align:center;padding:10px 2px;border-radius:var(--radius-sm);background:var(--cream);}
+.badge-item .b-emoji{font-size:26px;filter:grayscale(1);opacity:.35;}
+.badge-item.earned{background:var(--cream-deep);}
+.badge-item.earned .b-emoji{filter:none;opacity:1;}
+.badge-item .b-title{font-size:9.5px;font-weight:700;margin-top:4px;color:var(--ink-soft);line-height:1.25;}
+.badge-item.earned .b-title{color:var(--ink);}
+
 /* ---------- Exercise planner ---------- */
 .ex-add-row{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-3);}
 .ex-add-row select{flex:1 1 100%;}
@@ -389,6 +408,18 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .qty-row input{flex:1;text-align:center;font-size:19px;font-weight:700;padding:10px;font-family:var(--font-mono);}
 .qty-unit{font-size:13px;color:var(--ink-soft);flex-shrink:0;}
 .sheet .preview{background:var(--cream);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);}
+
+/* ---------- What-if simulator ---------- */
+.whatif-box{background:var(--cream);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:var(--space-4);}
+.whatif-title{font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+.whatif-row{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;}
+.whatif-row span:last-child{font-family:var(--font-mono);}
+.whatif-track{height:6px;background:var(--cream-deep);border-radius:4px;overflow:hidden;}
+.whatif-fill{height:100%;border-radius:4px;background:var(--herb);transition:width .3s ease, background .3s ease;}
+.whatif-fill.over{background:var(--paprika);}
+.whatif-remain{font-size:12px;margin-top:8px;color:var(--ink-soft);}
+.whatif-remain.over{color:var(--paprika);font-weight:700;}
+.whatif-remain.ok{color:var(--herb);font-weight:700;}
 .sheet .preview b{font-size:19px;font-family:var(--font-mono);}
 .sheet-buttons{display:flex;gap:var(--space-2);}
 .sheet-buttons button{flex:1;padding:14px;border-radius:var(--radius-sm);border:none;font-family:inherit;font-size:15px;cursor:pointer;font-weight:700;min-height:48px;}
@@ -398,6 +429,21 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .btn-confirm:active{background:var(--herb-dark);}
 
 footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--space-5) var(--space-3) 0;line-height:1.6;}
+
+/* ---------- Visual diary ---------- */
+.diary-gallery{display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;}
+.diary-thumb{flex-shrink:0;width:76px;text-align:center;}
+.diary-thumb img{width:76px;height:76px;object-fit:cover;border-radius:var(--radius-sm);display:block;}
+.diary-thumb .dt-name{font-size:9.5px;color:var(--ink-soft);margin-top:4px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.diary-empty{text-align:center;padding:18px 10px;color:var(--ink-soft);font-size:12.5px;}
+.lightbox{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:75;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:var(--space-4);
+}
+.lightbox.hidden{display:none;}
+.lightbox img{max-width:92%;max-height:70vh;border-radius:var(--radius-md);object-fit:contain;}
+.lightbox-caption{color:#fff;font-size:14px;font-weight:600;text-align:center;}
+.lightbox-close{position:absolute;top:calc(var(--space-4) + env(safe-area-inset-top));left:var(--space-4);background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:17px;}
 
 /* ---------- Milestone celebration ---------- */
 .milestone-overlay{
@@ -675,6 +721,12 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
           <button class="use-goal-btn" id="gcUseGoal">השתמש כיעד היומי שלי</button>
         </div>
       </div>
+
+      <div class="card">
+        <h2>🏅 תגי הישג</h2>
+        <div class="bmi-hint" style="margin-bottom:var(--space-3);">אספת <span id="badgesEarnedCount">0</span> מתוך <span id="badgesTotalCount">0</span> תגים</div>
+        <div id="badgesGrid" class="badges-grid"></div>
+      </div>
     </section>
 
     <!-- Page 2: Today -->
@@ -706,7 +758,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
           <span id="remainLabel">נותרו 2000 קק"ל</span>
           <span id="pctLabel">0%</span>
         </div>
-        <div class="macro-row">
+        <div class="macro-row macro-row-4">
           <div class="macro-chip p">
             <div class="v"><span id="proteinTotal">0</span><span class="mc-goal">/<span id="proteinGoal">0</span>g</span></div>
             <div class="k">חלבון</div>
@@ -721,6 +773,11 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
             <div class="v"><span id="fatTotal">0</span><span class="mc-goal">/<span id="fatGoal">0</span>g</span></div>
             <div class="k">שומן</div>
             <div class="mc-track"><div class="mc-fill" id="fatFill"></div></div>
+          </div>
+          <div class="macro-chip fi">
+            <div class="v"><span id="fiberTotal">0</span><span class="mc-goal">/<span id="fiberGoal">0</span>g</span></div>
+            <div class="k">סיבים</div>
+            <div class="mc-track"><div class="mc-fill" id="fiberFill"></div></div>
           </div>
         </div>
       </div>
@@ -742,6 +799,11 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
         <div class="bmi-hint" style="margin-bottom:var(--space-3);">מה איכות המזון שאכלת היום? חסר חלבון? יותר מדי מעובד? תן ל-AI לנתח.</div>
         <button class="calc-btn" id="analyzeDayBtn">נתח לי את היום</button>
         <div id="dayAnalysisWrap"></div>
+      </div>
+
+      <div class="card">
+        <h2>📷 יומן ויזואלי</h2>
+        <div id="visualDiaryWrap"></div>
       </div>
 
       <div class="card">
@@ -770,6 +832,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
         <h2>הוספת מזון</h2>
         <div class="search-row">
           <input type="text" id="foodSearch" placeholder="חפש מזון... (למשל: חומוס, אורז, חזה עוף)" autocomplete="off">
+          <button type="button" id="voiceSearchBtn" class="voice-btn" aria-label="חיפוש קולי">🎤</button>
           <div class="results" id="searchResults"></div>
         </div>
         <button class="add-custom" id="addCustomBtn">+ מזון לא נמצא? הוסף מזון מותאם אישית</button>
@@ -952,6 +1015,12 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
       <span>ערך תזונתי לכמות זו:</span>
       <span><b id="qtyKcalPreview">0</b> קק"ל</span>
     </div>
+    <div class="whatif-box" id="whatifBox">
+      <div class="whatif-title">אם תוסיף/י את זה עכשיו</div>
+      <div class="whatif-row"><span>סה"כ יום</span><span id="whatifTotal">0 / 0 קק"ל</span></div>
+      <div class="whatif-track"><div class="whatif-fill" id="whatifFill"></div></div>
+      <div class="whatif-remain" id="whatifRemain"></div>
+    </div>
     <div class="sheet-buttons">
       <button class="btn-cancel" id="qtyCancel">ביטול</button>
       <button class="btn-confirm" id="qtyConfirm">הוסף ליומן</button>
@@ -996,6 +1065,9 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
     <div class="field-row">
       <div><span class="field-label">פחמימה (g)</span><input type="number" id="cfCarb" placeholder="0" inputmode="numeric"></div>
       <div><span class="field-label">שומן (g)</span><input type="number" id="cfFat" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div class="field-row">
+      <div><span class="field-label">סיבים תזונתיים (g)</span><input type="number" id="cfFiber" placeholder="0" inputmode="numeric"></div>
     </div>
     <div class="sheet-buttons" style="margin-top:var(--space-3);">
       <button class="btn-cancel" id="cfCancel">ביטול</button>
@@ -1064,172 +1136,179 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
   </div>
 </div>
 
+<!-- Visual diary lightbox -->
+<div class="lightbox hidden" id="diaryLightbox">
+  <button class="lightbox-close" id="diaryLightboxClose" aria-label="סגור">✕</button>
+  <img id="diaryLightboxImg" alt="תמונת מזון">
+  <div class="lightbox-caption" id="diaryLightboxCaption"></div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js"></script>
 <script>
 // ---------- Food database (per 100g) ----------
 const FOOD_DB = [
-  {name:"אורז לבן מבושל",cat:"דגנים",kcal:130,p:2.7,c:28,f:0.3},
-  {name:"אורז מלא מבושל",cat:"דגנים",kcal:112,p:2.6,c:23,f:0.9},
-  {name:"פסטה מבושלת",cat:"דגנים",kcal:158,p:5.8,c:31,f:0.9},
-  {name:"לחם לבן",cat:"דגנים",kcal:265,p:9,c:49,f:3.2},
-  {name:"לחם מלא",cat:"דגנים",kcal:247,p:13,c:41,f:3.4},
-  {name:"בגט",cat:"דגנים",kcal:270,p:9,c:55,f:2},
-  {name:"פירה תפוחי אדמה",cat:"תוספות",kcal:113,p:2,c:17,f:4.2},
-  {name:"פיתה",cat:"דגנים",kcal:275,p:9,c:55,f:1.2},
-  {name:"קוואקר / שיבולת שועל",cat:"דגנים",kcal:389,p:16.9,c:66,f:6.9},
-  {name:"קינואה מבושלת",cat:"דגנים",kcal:120,p:4.4,c:21,f:1.9},
-  {name:"קוסקוס מבושל",cat:"דגנים",kcal:112,p:3.8,c:23,f:0.2},
-  {name:"תפוח אדמה אפוי",cat:"ירקות",kcal:93,p:2.5,c:21,f:0.1},
-  {name:"בטטה אפויה",cat:"ירקות",kcal:90,p:2,c:21,f:0.1},
-  {name:"עגבנייה",cat:"ירקות",kcal:18,p:0.9,c:3.9,f:0.2},
-  {name:"מלפפון",cat:"ירקות",kcal:15,p:0.7,c:3.6,f:0.1},
-  {name:"פלפל אדום",cat:"ירקות",kcal:31,p:1,c:6,f:0.3},
-  {name:"בצל",cat:"ירקות",kcal:40,p:1.1,c:9.3,f:0.1},
-  {name:"גזר",cat:"ירקות",kcal:41,p:0.9,c:10,f:0.2},
-  {name:"חסה",cat:"ירקות",kcal:15,p:1.4,c:2.9,f:0.2},
-  {name:"ברוקולי מבושל",cat:"ירקות",kcal:35,p:2.4,c:7,f:0.4},
-  {name:"קישוא",cat:"ירקות",kcal:17,p:1.2,c:3.1,f:0.3},
-  {name:"אבוקדו",cat:"ירקות",kcal:160,p:2,c:8.5,f:14.7},
-  {name:"תפוח עץ",cat:"פירות",kcal:52,p:0.3,c:14,f:0.2},
-  {name:"בננה",cat:"פירות",kcal:89,p:1.1,c:23,f:0.3},
-  {name:"תפוז",cat:"פירות",kcal:47,p:0.9,c:12,f:0.1},
-  {name:"ענבים",cat:"פירות",kcal:69,p:0.7,c:18,f:0.2},
-  {name:"תות שדה",cat:"פירות",kcal:32,p:0.7,c:7.7,f:0.3},
-  {name:"אבטיח",cat:"פירות",kcal:30,p:0.6,c:7.6,f:0.2},
-  {name:"מנגו",cat:"פירות",kcal:60,p:0.8,c:15,f:0.4},
-  {name:"תמר",cat:"פירות",kcal:277,p:1.8,c:75,f:0.2},
-  {name:"חזה עוף מבושל",cat:"חלבון",kcal:165,p:31,c:0,f:3.6},
-  {name:"שוקי עוף",cat:"חלבון",kcal:216,p:26,c:0,f:12},
-  {name:"בקר טחון רזה מטוגן",cat:"חלבון",kcal:217,p:26,c:0,f:12},
-  {name:"סטייק בקר",cat:"חלבון",kcal:271,p:25,c:0,f:19},
-  {name:"הודו טחון",cat:"חלבון",kcal:189,p:27,c:0,f:8},
-  {name:"סלמון אפוי",cat:"חלבון",kcal:206,p:22,c:0,f:13},
-  {name:"טונה בשימורים במים",cat:"חלבון",kcal:116,p:26,c:0,f:0.8},
-  {name:"ביצה קשה",cat:"חלבון",kcal:155,p:13,c:1.1,f:11},
-  {name:"טופו",cat:"חלבון",kcal:76,p:8,c:1.9,f:4.8},
-  {name:"עדשים מבושלות",cat:"קטניות",kcal:116,p:9,c:20,f:0.4},
-  {name:"חומוס גרגירים מבושל",cat:"קטניות",kcal:164,p:8.9,c:27,f:2.6},
-  {name:"חומוס (סלט)",cat:"קטניות",kcal:166,p:7.9,c:14,f:9.6},
-  {name:"שעועית שחורה מבושלת",cat:"קטניות",kcal:132,p:8.9,c:24,f:0.5},
-  {name:"פלאפל (5 כדורים)",cat:"קטניות",kcal:333,p:13,c:31,f:18},
-  {name:"טחינה גולמית",cat:"רטבים",kcal:595,p:17,c:21,f:53,perServing:true},
-  {name:"חלב 3%",cat:"מוצרי חלב",kcal:61,p:3.2,c:4.8,f:3.3},
-  {name:"חלב 1%",cat:"מוצרי חלב",kcal:42,p:3.4,c:5,f:1},
-  {name:"יוגורט טבעי 3%",cat:"מוצרי חלב",kcal:61,p:3.5,c:4.7,f:3.3},
-  {name:"יוגורט יווני",cat:"מוצרי חלב",kcal:97,p:9,c:3.6,f:5},
-  {name:"קוטג' 5%",cat:"מוצרי חלב",kcal:110,p:12,c:3.4,f:5},
-  {name:"גבינה צהובה",cat:"מוצרי חלב",kcal:350,p:25,c:1.3,f:27},
-  {name:"גבינה לבנה 5%",cat:"מוצרי חלב",kcal:96,p:8.5,c:3.5,f:5},
-  {name:"שקדים",cat:"אגוזים",kcal:579,p:21,c:22,f:50},
-  {name:"אגוזי מלך",cat:"אגוזים",kcal:654,p:15,c:14,f:65},
-  {name:"בוטנים",cat:"אגוזים",kcal:567,p:26,c:16,f:49},
-  {name:"חמאת בוטנים",cat:"אגוזים",kcal:588,p:25,c:20,f:50},
-  {name:"שמן זית",cat:"שומנים",kcal:884,p:0,c:0,f:100},
-  {name:"חמאה",cat:"שומנים",kcal:717,p:0.9,c:0.1,f:81},
-  {name:"שוקולד חלב",cat:"ממתקים",kcal:535,p:7.7,c:59,f:30},
-  {name:"שוקולד מריר 70%",cat:"ממתקים",kcal:598,p:7.8,c:46,f:43},
-  {name:"עוגיות שוקולד צ'יפס",cat:"ממתקים",kcal:488,p:5.4,c:64,f:24},
-  {name:"גלידה וניל",cat:"ממתקים",kcal:207,p:3.5,c:24,f:11},
-  {name:"חטיף שוקולד (בייגל בייגל וכו')",cat:"ממתקים",kcal:490,p:6,c:58,f:26},
-  {name:"קורנפלקס",cat:"דגני בוקר",kcal:357,p:7.5,c:84,f:0.9},
-  {name:"פיצה (פרוסה בינונית)",cat:"ארוחות מוכנות",kcal:266,p:11,c:33,f:10,perServing:true},
-  {name:"המבורגר בלחמנייה",cat:"ארוחות מוכנות",kcal:295,p:17,c:24,f:14,perServing:true},
-  {name:"שווארמה בפיתה",cat:"ארוחות מוכנות",kcal:550,p:28,c:45,f:29,perServing:true},
-  {name:"סושי (8 חתיכות)",cat:"ארוחות מוכנות",kcal:350,p:9,c:70,f:2,perServing:true},
-  {name:"קפה שחור",cat:"משקאות",kcal:2,p:0.3,c:0,f:0},
-  {name:"קפה אספרסו",cat:"משקאות",kcal:3,p:0.3,c:0.5,f:0.1,perServing:true},
-  {name:"קפה נמס עלית (כפית, ללא חלב וסוכר)",cat:"משקאות",kcal:6,p:0.3,c:1,f:0,perServing:true},
-  {name:"קפה נמס עם חלב",cat:"משקאות",kcal:90,p:4,c:6,f:5,perServing:true},
-  {name:"קפה הפוך (חלב 3%)",cat:"משקאות",kcal:60,p:3,c:4.5,f:3,perServing:true},
-  {name:"קולה",cat:"משקאות",kcal:42,p:0,c:10.6,f:0},
-  {name:"מיץ תפוזים סחוט",cat:"משקאות",kcal:45,p:0.7,c:10.4,f:0.2},
-  {name:"בירה",cat:"משקאות",kcal:43,p:0.5,c:3.6,f:0},
-  {name:"יין אדום",cat:"משקאות",kcal:85,p:0.1,c:2.6,f:0},
+  {name:"אורז לבן מבושל",cat:"דגנים",kcal:130,p:2.7,c:28,f:0.3,fi:0.4},
+  {name:"אורז מלא מבושל",cat:"דגנים",kcal:112,p:2.6,c:23,f:0.9,fi:1.8},
+  {name:"פסטה מבושלת",cat:"דגנים",kcal:158,p:5.8,c:31,f:0.9,fi:1.8},
+  {name:"לחם לבן",cat:"דגנים",kcal:265,p:9,c:49,f:3.2,fi:2.7},
+  {name:"לחם מלא",cat:"דגנים",kcal:247,p:13,c:41,f:3.4,fi:6.0},
+  {name:"בגט",cat:"דגנים",kcal:270,p:9,c:55,f:2,fi:2.5},
+  {name:"פירה תפוחי אדמה",cat:"תוספות",kcal:113,p:2,c:17,f:4.2,fi:1.8},
+  {name:"פיתה",cat:"דגנים",kcal:275,p:9,c:55,f:1.2,fi:2.0},
+  {name:"קוואקר / שיבולת שועל",cat:"דגנים",kcal:389,p:16.9,c:66,f:6.9,fi:8.0},
+  {name:"קינואה מבושלת",cat:"דגנים",kcal:120,p:4.4,c:21,f:1.9,fi:2.8},
+  {name:"קוסקוס מבושל",cat:"דגנים",kcal:112,p:3.8,c:23,f:0.2,fi:1.4},
+  {name:"תפוח אדמה אפוי",cat:"ירקות",kcal:93,p:2.5,c:21,f:0.1,fi:2.2},
+  {name:"בטטה אפויה",cat:"ירקות",kcal:90,p:2,c:21,f:0.1,fi:3.3},
+  {name:"עגבנייה",cat:"ירקות",kcal:18,p:0.9,c:3.9,f:0.2,fi:1.2},
+  {name:"מלפפון",cat:"ירקות",kcal:15,p:0.7,c:3.6,f:0.1,fi:0.5},
+  {name:"פלפל אדום",cat:"ירקות",kcal:31,p:1,c:6,f:0.3,fi:2.1},
+  {name:"בצל",cat:"ירקות",kcal:40,p:1.1,c:9.3,f:0.1,fi:1.7},
+  {name:"גזר",cat:"ירקות",kcal:41,p:0.9,c:10,f:0.2,fi:2.8},
+  {name:"חסה",cat:"ירקות",kcal:15,p:1.4,c:2.9,f:0.2,fi:1.3},
+  {name:"ברוקולי מבושל",cat:"ירקות",kcal:35,p:2.4,c:7,f:0.4,fi:3.3},
+  {name:"קישוא",cat:"ירקות",kcal:17,p:1.2,c:3.1,f:0.3,fi:1.0},
+  {name:"אבוקדו",cat:"ירקות",kcal:160,p:2,c:8.5,f:14.7,fi:6.7},
+  {name:"תפוח עץ",cat:"פירות",kcal:52,p:0.3,c:14,f:0.2,fi:2.4},
+  {name:"בננה",cat:"פירות",kcal:89,p:1.1,c:23,f:0.3,fi:2.6},
+  {name:"תפוז",cat:"פירות",kcal:47,p:0.9,c:12,f:0.1,fi:2.4},
+  {name:"ענבים",cat:"פירות",kcal:69,p:0.7,c:18,f:0.2,fi:0.9},
+  {name:"תות שדה",cat:"פירות",kcal:32,p:0.7,c:7.7,f:0.3,fi:2.0},
+  {name:"אבטיח",cat:"פירות",kcal:30,p:0.6,c:7.6,f:0.2,fi:0.4},
+  {name:"מנגו",cat:"פירות",kcal:60,p:0.8,c:15,f:0.4,fi:1.6},
+  {name:"תמר",cat:"פירות",kcal:277,p:1.8,c:75,f:0.2,fi:6.7},
+  {name:"חזה עוף מבושל",cat:"חלבון",kcal:165,p:31,c:0,f:3.6,fi:0},
+  {name:"שוקי עוף",cat:"חלבון",kcal:216,p:26,c:0,f:12,fi:0},
+  {name:"בקר טחון רזה מטוגן",cat:"חלבון",kcal:217,p:26,c:0,f:12,fi:0},
+  {name:"סטייק בקר",cat:"חלבון",kcal:271,p:25,c:0,f:19,fi:0},
+  {name:"הודו טחון",cat:"חלבון",kcal:189,p:27,c:0,f:8,fi:0},
+  {name:"סלמון אפוי",cat:"חלבון",kcal:206,p:22,c:0,f:13,fi:0},
+  {name:"טונה בשימורים במים",cat:"חלבון",kcal:116,p:26,c:0,f:0.8,fi:0},
+  {name:"ביצה קשה",cat:"חלבון",kcal:155,p:13,c:1.1,f:11,fi:0},
+  {name:"טופו",cat:"חלבון",kcal:76,p:8,c:1.9,f:4.8,fi:0.9},
+  {name:"עדשים מבושלות",cat:"קטניות",kcal:116,p:9,c:20,f:0.4,fi:7.9},
+  {name:"חומוס גרגירים מבושל",cat:"קטניות",kcal:164,p:8.9,c:27,f:2.6,fi:7.6},
+  {name:"חומוס (סלט)",cat:"קטניות",kcal:166,p:7.9,c:14,f:9.6,fi:4.0},
+  {name:"שעועית שחורה מבושלת",cat:"קטניות",kcal:132,p:8.9,c:24,f:0.5,fi:8.7},
+  {name:"פלאפל (5 כדורים)",cat:"קטניות",kcal:333,p:13,c:31,f:18,fi:5.0},
+  {name:"טחינה גולמית",cat:"רטבים",kcal:595,p:17,c:21,f:53,fi:1.4,perServing:true},
+  {name:"חלב 3%",cat:"מוצרי חלב",kcal:61,p:3.2,c:4.8,f:3.3,fi:0},
+  {name:"חלב 1%",cat:"מוצרי חלב",kcal:42,p:3.4,c:5,f:1,fi:0},
+  {name:"יוגורט טבעי 3%",cat:"מוצרי חלב",kcal:61,p:3.5,c:4.7,f:3.3,fi:0},
+  {name:"יוגורט יווני",cat:"מוצרי חלב",kcal:97,p:9,c:3.6,f:5,fi:0},
+  {name:"קוטג' 5%",cat:"מוצרי חלב",kcal:110,p:12,c:3.4,f:5,fi:0},
+  {name:"גבינה צהובה",cat:"מוצרי חלב",kcal:350,p:25,c:1.3,f:27,fi:0},
+  {name:"גבינה לבנה 5%",cat:"מוצרי חלב",kcal:96,p:8.5,c:3.5,f:5,fi:0},
+  {name:"שקדים",cat:"אגוזים",kcal:579,p:21,c:22,f:50,fi:12.5},
+  {name:"אגוזי מלך",cat:"אגוזים",kcal:654,p:15,c:14,f:65,fi:6.7},
+  {name:"בוטנים",cat:"אגוזים",kcal:567,p:26,c:16,f:49,fi:8.5},
+  {name:"חמאת בוטנים",cat:"אגוזים",kcal:588,p:25,c:20,f:50,fi:6.0},
+  {name:"שמן זית",cat:"שומנים",kcal:884,p:0,c:0,f:100,fi:0},
+  {name:"חמאה",cat:"שומנים",kcal:717,p:0.9,c:0.1,f:81,fi:0},
+  {name:"שוקולד חלב",cat:"ממתקים",kcal:535,p:7.7,c:59,f:30,fi:1.5},
+  {name:"שוקולד מריר 70%",cat:"ממתקים",kcal:598,p:7.8,c:46,f:43,fi:7.0},
+  {name:"עוגיות שוקולד צ'יפס",cat:"ממתקים",kcal:488,p:5.4,c:64,f:24,fi:1.8},
+  {name:"גלידה וניל",cat:"ממתקים",kcal:207,p:3.5,c:24,f:11,fi:0.5},
+  {name:"חטיף שוקולד (בייגל בייגל וכו')",cat:"ממתקים",kcal:490,p:6,c:58,f:26,fi:1.5},
+  {name:"קורנפלקס",cat:"דגני בוקר",kcal:357,p:7.5,c:84,f:0.9,fi:0.9},
+  {name:"פיצה (פרוסה בינונית)",cat:"ארוחות מוכנות",kcal:266,p:11,c:33,f:10,fi:1.8,perServing:true},
+  {name:"המבורגר בלחמנייה",cat:"ארוחות מוכנות",kcal:295,p:17,c:24,f:14,fi:2.5,perServing:true},
+  {name:"שווארמה בפיתה",cat:"ארוחות מוכנות",kcal:550,p:28,c:45,f:29,fi:3.0,perServing:true},
+  {name:"סושי (8 חתיכות)",cat:"ארוחות מוכנות",kcal:350,p:9,c:70,f:2,fi:1.0,perServing:true},
+  {name:"קפה שחור",cat:"משקאות",kcal:2,p:0.3,c:0,f:0,fi:0},
+  {name:"קפה אספרסו",cat:"משקאות",kcal:3,p:0.3,c:0.5,f:0.1,fi:0,perServing:true},
+  {name:"קפה נמס עלית (כפית, ללא חלב וסוכר)",cat:"משקאות",kcal:6,p:0.3,c:1,f:0,fi:0,perServing:true},
+  {name:"קפה נמס עם חלב",cat:"משקאות",kcal:90,p:4,c:6,f:5,fi:0,perServing:true},
+  {name:"קפה הפוך (חלב 3%)",cat:"משקאות",kcal:60,p:3,c:4.5,f:3,fi:0,perServing:true},
+  {name:"קולה",cat:"משקאות",kcal:42,p:0,c:10.6,f:0,fi:0},
+  {name:"מיץ תפוזים סחוט",cat:"משקאות",kcal:45,p:0.7,c:10.4,f:0.2,fi:0.2},
+  {name:"בירה",cat:"משקאות",kcal:43,p:0.5,c:3.6,f:0,fi:0},
+  {name:"יין אדום",cat:"משקאות",kcal:85,p:0.1,c:2.6,f:0,fi:0},
 
-  {name:"בורגול מבושל",cat:"דגנים",kcal:83,p:3,c:18.6,f:0.2},
-  {name:"גרנולה",cat:"דגני בוקר",kcal:471,p:10,c:64,f:20},
-  {name:"טורטייה (חיטה)",cat:"דגנים",kcal:290,p:8,c:48,f:7,perServing:true},
-  {name:"במבה",cat:"חטיפים",kcal:536,p:11,c:47,f:34},
-  {name:"ביסלי",cat:"חטיפים",kcal:470,p:8,c:60,f:22},
-  {name:"עוגיות פתיבר",cat:"חטיפים",kcal:440,p:8,c:70,f:14},
-  {name:"וופל עם שוקולד",cat:"ממתקים",kcal:500,p:5,c:60,f:26},
-  {name:"מרשמלו",cat:"ממתקים",kcal:318,p:1.8,c:81,f:0.2},
-  {name:"ג'לי דיאט",cat:"ממתקים",kcal:7,p:1.2,c:0.5,f:0},
-  {name:"דבש",cat:"ממתקים",kcal:304,p:0.3,c:82,f:0},
-  {name:"ריבה",cat:"ממתקים",kcal:250,p:0.3,c:65,f:0},
+  {name:"בורגול מבושל",cat:"דגנים",kcal:83,p:3,c:18.6,f:0.2,fi:4.5},
+  {name:"גרנולה",cat:"דגני בוקר",kcal:471,p:10,c:64,f:20,fi:6.0},
+  {name:"טורטייה (חיטה)",cat:"דגנים",kcal:290,p:8,c:48,f:7,fi:1.8,perServing:true},
+  {name:"במבה",cat:"חטיפים",kcal:536,p:11,c:47,f:34,fi:1.5},
+  {name:"ביסלי",cat:"חטיפים",kcal:470,p:8,c:60,f:22,fi:2.0},
+  {name:"עוגיות פתיבר",cat:"חטיפים",kcal:440,p:8,c:70,f:14,fi:3.0},
+  {name:"וופל עם שוקולד",cat:"ממתקים",kcal:500,p:5,c:60,f:26,fi:1.2},
+  {name:"מרשמלו",cat:"ממתקים",kcal:318,p:1.8,c:81,f:0.2,fi:0},
+  {name:"ג'לי דיאט",cat:"ממתקים",kcal:7,p:1.2,c:0.5,f:0,fi:0},
+  {name:"דבש",cat:"ממתקים",kcal:304,p:0.3,c:82,f:0,fi:0.2},
+  {name:"ריבה",cat:"ממתקים",kcal:250,p:0.3,c:65,f:0,fi:0.5},
 
-  {name:"כרוב לבן",cat:"ירקות",kcal:25,p:1.3,c:5.8,f:0.1},
-  {name:"תרד מבושל",cat:"ירקות",kcal:23,p:2.9,c:3.6,f:0.4},
-  {name:"פטריות",cat:"ירקות",kcal:22,p:3.1,c:3.3,f:0.3},
-  {name:"חציל צלוי",cat:"ירקות",kcal:35,p:0.8,c:8.6,f:0.2},
-  {name:"שעועית ירוקה מבושלת",cat:"ירקות",kcal:35,p:1.8,c:7,f:0.2},
-  {name:"תירס מתוק",cat:"ירקות",kcal:96,p:3.4,c:21,f:1.5},
-  {name:"סלק מבושל",cat:"ירקות",kcal:44,p:1.7,c:10,f:0.2},
-  {name:"צנונית",cat:"ירקות",kcal:16,p:0.7,c:3.4,f:0.1},
-  {name:"פלפל ירוק",cat:"ירקות",kcal:20,p:0.9,c:4.6,f:0.2},
-  {name:"שום",cat:"ירקות",kcal:149,p:6.4,c:33,f:0.5},
-  {name:"כרובית מבושלת",cat:"ירקות",kcal:25,p:1.9,c:5,f:0.3},
-  {name:"סלט ירקות ישראלי",cat:"ירקות",kcal:45,p:1.3,c:8,f:1.2},
+  {name:"כרוב לבן",cat:"ירקות",kcal:25,p:1.3,c:5.8,f:0.1,fi:2.5},
+  {name:"תרד מבושל",cat:"ירקות",kcal:23,p:2.9,c:3.6,f:0.4,fi:2.4},
+  {name:"פטריות",cat:"ירקות",kcal:22,p:3.1,c:3.3,f:0.3,fi:1.0},
+  {name:"חציל צלוי",cat:"ירקות",kcal:35,p:0.8,c:8.6,f:0.2,fi:3.0},
+  {name:"שעועית ירוקה מבושלת",cat:"ירקות",kcal:35,p:1.8,c:7,f:0.2,fi:3.4},
+  {name:"תירס מתוק",cat:"ירקות",kcal:96,p:3.4,c:21,f:1.5,fi:2.7},
+  {name:"סלק מבושל",cat:"ירקות",kcal:44,p:1.7,c:10,f:0.2,fi:2.8},
+  {name:"צנונית",cat:"ירקות",kcal:16,p:0.7,c:3.4,f:0.1,fi:1.6},
+  {name:"פלפל ירוק",cat:"ירקות",kcal:20,p:0.9,c:4.6,f:0.2,fi:1.7},
+  {name:"שום",cat:"ירקות",kcal:149,p:6.4,c:33,f:0.5,fi:2.1},
+  {name:"כרובית מבושלת",cat:"ירקות",kcal:25,p:1.9,c:5,f:0.3,fi:2.0},
+  {name:"סלט ירקות ישראלי",cat:"ירקות",kcal:45,p:1.3,c:8,f:1.2,fi:1.8},
 
-  {name:"אפרסק",cat:"פירות",kcal:39,p:0.9,c:9.5,f:0.3},
-  {name:"משמש",cat:"פירות",kcal:48,p:1.4,c:11,f:0.4},
-  {name:"קיווי",cat:"פירות",kcal:61,p:1.1,c:14.7,f:0.5},
-  {name:"אננס",cat:"פירות",kcal:50,p:0.5,c:13.1,f:0.1},
-  {name:"רימון (גרגרים)",cat:"פירות",kcal:83,p:1.7,c:19,f:1.2},
-  {name:"שזיף",cat:"פירות",kcal:46,p:0.7,c:11.4,f:0.3},
-  {name:"אגס",cat:"פירות",kcal:57,p:0.4,c:15,f:0.1},
-  {name:"מלון",cat:"פירות",kcal:34,p:0.8,c:8.2,f:0.2},
-  {name:"פסיפלורה",cat:"פירות",kcal:97,p:2.2,c:23,f:0.7},
+  {name:"אפרסק",cat:"פירות",kcal:39,p:0.9,c:9.5,f:0.3,fi:1.5},
+  {name:"משמש",cat:"פירות",kcal:48,p:1.4,c:11,f:0.4,fi:2.0},
+  {name:"קיווי",cat:"פירות",kcal:61,p:1.1,c:14.7,f:0.5,fi:3.0},
+  {name:"אננס",cat:"פירות",kcal:50,p:0.5,c:13.1,f:0.1,fi:1.4},
+  {name:"רימון (גרגרים)",cat:"פירות",kcal:83,p:1.7,c:19,f:1.2,fi:4.0},
+  {name:"שזיף",cat:"פירות",kcal:46,p:0.7,c:11.4,f:0.3,fi:1.4},
+  {name:"אגס",cat:"פירות",kcal:57,p:0.4,c:15,f:0.1,fi:3.1},
+  {name:"מלון",cat:"פירות",kcal:34,p:0.8,c:8.2,f:0.2,fi:0.9},
+  {name:"פסיפלורה",cat:"פירות",kcal:97,p:2.2,c:23,f:0.7,fi:10.4},
 
-  {name:"דג אמנון (מושט)",cat:"חלבון",kcal:128,p:26,c:0,f:2.7},
-  {name:"דג בקלה",cat:"חלבון",kcal:82,p:18,c:0,f:0.7},
-  {name:"שרימפס מבושל",cat:"חלבון",kcal:99,p:24,c:0.2,f:0.3},
-  {name:"כבד עוף מבושל",cat:"חלבון",kcal:167,p:24.5,c:0.9,f:6.5},
-  {name:"קציצות בקר",cat:"חלבון",kcal:230,p:18,c:6,f:15,perServing:true},
-  {name:"נקניקיות עוף",cat:"חלבון",kcal:280,p:12,c:4,f:24},
-  {name:"פסטרמה",cat:"חלבון",kcal:147,p:21,c:1.5,f:6},
-  {name:"סטייק טונה",cat:"חלבון",kcal:184,p:30,c:0,f:6.3},
+  {name:"דג אמנון (מושט)",cat:"חלבון",kcal:128,p:26,c:0,f:2.7,fi:0},
+  {name:"דג בקלה",cat:"חלבון",kcal:82,p:18,c:0,f:0.7,fi:0},
+  {name:"שרימפס מבושל",cat:"חלבון",kcal:99,p:24,c:0.2,f:0.3,fi:0},
+  {name:"כבד עוף מבושל",cat:"חלבון",kcal:167,p:24.5,c:0.9,f:6.5,fi:0},
+  {name:"קציצות בקר",cat:"חלבון",kcal:230,p:18,c:6,f:15,fi:0.3,perServing:true},
+  {name:"נקניקיות עוף",cat:"חלבון",kcal:280,p:12,c:4,f:24,fi:0},
+  {name:"פסטרמה",cat:"חלבון",kcal:147,p:21,c:1.5,f:6,fi:0},
+  {name:"סטייק טונה",cat:"חלבון",kcal:184,p:30,c:0,f:6.3,fi:0},
 
-  {name:"חלב סויה",cat:"מוצרי חלב",kcal:54,p:3.3,c:6,f:1.8},
-  {name:"גבינת עיזים",cat:"מוצרי חלב",kcal:364,p:22,c:0.1,f:30},
-  {name:"לבנה",cat:"מוצרי חלב",kcal:90,p:5,c:5,f:5.5},
-  {name:"שמנת מתוקה 38%",cat:"מוצרי חלב",kcal:340,p:2.2,c:3.3,f:36},
-  {name:"גבינת שמנת",cat:"מוצרי חלב",kcal:342,p:6,c:4,f:34},
-  {name:"מוצרלה",cat:"מוצרי חלב",kcal:280,p:22,c:2.2,f:20},
-  {name:"פרמזן מגורר",cat:"מוצרי חלב",kcal:420,p:38,c:3.2,f:29},
-  {name:"חלב עמיד 3%",cat:"מוצרי חלב",kcal:60,p:3.1,c:4.7,f:3.2},
+  {name:"חלב סויה",cat:"מוצרי חלב",kcal:54,p:3.3,c:6,f:1.8,fi:0.4},
+  {name:"גבינת עיזים",cat:"מוצרי חלב",kcal:364,p:22,c:0.1,f:30,fi:0},
+  {name:"לבנה",cat:"מוצרי חלב",kcal:90,p:5,c:5,f:5.5,fi:0},
+  {name:"שמנת מתוקה 38%",cat:"מוצרי חלב",kcal:340,p:2.2,c:3.3,f:36,fi:0},
+  {name:"גבינת שמנת",cat:"מוצרי חלב",kcal:342,p:6,c:4,f:34,fi:0},
+  {name:"מוצרלה",cat:"מוצרי חלב",kcal:280,p:22,c:2.2,f:20,fi:0},
+  {name:"פרמזן מגורר",cat:"מוצרי חלב",kcal:420,p:38,c:3.2,f:29,fi:0},
+  {name:"חלב עמיד 3%",cat:"מוצרי חלב",kcal:60,p:3.1,c:4.7,f:3.2,fi:0},
 
-  {name:"אגוזי קשיו",cat:"אגוזים",kcal:553,p:18,c:30,f:44},
-  {name:"פיסטוקים",cat:"אגוזים",kcal:562,p:20,c:28,f:45},
-  {name:"גרעיני חמנייה",cat:"אגוזים",kcal:584,p:21,c:20,f:51},
-  {name:"גרעיני דלעת",cat:"אגוזים",kcal:559,p:30,c:11,f:49},
-  {name:"טחינה מוכנה עם לימון",cat:"רטבים",kcal:230,p:6,c:8,f:20,perServing:true},
+  {name:"אגוזי קשיו",cat:"אגוזים",kcal:553,p:18,c:30,f:44,fi:3.3},
+  {name:"פיסטוקים",cat:"אגוזים",kcal:562,p:20,c:28,f:45,fi:10.0},
+  {name:"גרעיני חמנייה",cat:"אגוזים",kcal:584,p:21,c:20,f:51,fi:8.6},
+  {name:"גרעיני דלעת",cat:"אגוזים",kcal:559,p:30,c:11,f:49,fi:6.0},
+  {name:"טחינה מוכנה עם לימון",cat:"רטבים",kcal:230,p:6,c:8,f:20,fi:1.2,perServing:true},
 
-  {name:"קטשופ",cat:"רטבים",kcal:112,p:1.7,c:26,f:0.3},
-  {name:"מיונז",cat:"רטבים",kcal:680,p:1,c:1,f:75},
-  {name:"חרדל",cat:"רטבים",kcal:66,p:4.4,c:5,f:3.3},
-  {name:"שמן קנולה",cat:"שומנים",kcal:884,p:0,c:0,f:100},
-  {name:"רוטב סויה",cat:"רטבים",kcal:53,p:8,c:5,f:0.1},
+  {name:"קטשופ",cat:"רטבים",kcal:112,p:1.7,c:26,f:0.3,fi:0.3},
+  {name:"מיונז",cat:"רטבים",kcal:680,p:1,c:1,f:75,fi:0},
+  {name:"חרדל",cat:"רטבים",kcal:66,p:4.4,c:5,f:3.3,fi:3.3},
+  {name:"שמן קנולה",cat:"שומנים",kcal:884,p:0,c:0,f:100,fi:0},
+  {name:"רוטב סויה",cat:"רטבים",kcal:53,p:8,c:5,f:0.1,fi:0.8},
 
-  {name:"שקשוקה (מנה)",cat:"ארוחות מוכנות",kcal:320,p:16,c:12,f:23,perServing:true},
-  {name:"בורקס גבינה",cat:"ארוחות מוכנות",kcal:290,p:7,c:24,f:18,perServing:true},
-  {name:"סביח בפיתה",cat:"ארוחות מוכנות",kcal:520,p:14,c:60,f:25,perServing:true},
-  {name:"כריך גבינה צהובה",cat:"ארוחות מוכנות",kcal:340,p:15,c:32,f:17,perServing:true},
-  {name:"שניצל עוף",cat:"ארוחות מוכנות",kcal:310,p:24,c:18,f:16,perServing:true},
-  {name:"שניצל טבעול",cat:"ארוחות מוכנות",kcal:150,p:8,c:12,f:9,perServing:true},
-  {name:"פסטה ברוטב עגבניות",cat:"ארוחות מוכנות",kcal:380,p:12,c:65,f:8,perServing:true},
-  {name:"מרק עוף עם אטריות",cat:"ארוחות מוכנות",kcal:120,p:8,c:14,f:3,perServing:true},
-  {name:"חביתה (2 ביצים)",cat:"ארוחות מוכנות",kcal:180,p:13,c:1.5,f:14,perServing:true},
-  {name:"סלט טונה עם ביצה",cat:"ארוחות מוכנות",kcal:280,p:22,c:6,f:19,perServing:true},
-  {name:"מוקפץ ירקות עם עוף",cat:"ארוחות מוכנות",kcal:290,p:26,c:15,f:14,perServing:true},
+  {name:"שקשוקה (מנה)",cat:"ארוחות מוכנות",kcal:320,p:16,c:12,f:23,fi:2.5,perServing:true},
+  {name:"בורקס גבינה",cat:"ארוחות מוכנות",kcal:290,p:7,c:24,f:18,fi:1.0,perServing:true},
+  {name:"סביח בפיתה",cat:"ארוחות מוכנות",kcal:520,p:14,c:60,f:25,fi:5.0,perServing:true},
+  {name:"כריך גבינה צהובה",cat:"ארוחות מוכנות",kcal:340,p:15,c:32,f:17,fi:2.0,perServing:true},
+  {name:"שניצל עוף",cat:"ארוחות מוכנות",kcal:310,p:24,c:18,f:16,fi:1.0,perServing:true},
+  {name:"שניצל טבעול",cat:"ארוחות מוכנות",kcal:150,p:8,c:12,f:9,fi:3.0,perServing:true},
+  {name:"פסטה ברוטב עגבניות",cat:"ארוחות מוכנות",kcal:380,p:12,c:65,f:8,fi:3.0,perServing:true},
+  {name:"מרק עוף עם אטריות",cat:"ארוחות מוכנות",kcal:120,p:8,c:14,f:3,fi:1.5,perServing:true},
+  {name:"חביתה (2 ביצים)",cat:"ארוחות מוכנות",kcal:180,p:13,c:1.5,f:14,fi:0.3,perServing:true},
+  {name:"סלט טונה עם ביצה",cat:"ארוחות מוכנות",kcal:280,p:22,c:6,f:19,fi:1.0,perServing:true},
+  {name:"מוקפץ ירקות עם עוף",cat:"ארוחות מוכנות",kcal:290,p:26,c:15,f:14,fi:3.5,perServing:true},
 
-  {name:"מיץ ענבים",cat:"משקאות",kcal:60,p:0.4,c:15,f:0.1},
-  {name:"סודה/מים מוגזים",cat:"משקאות",kcal:0,p:0,c:0,f:0},
-  {name:"בירה לייט",cat:"משקאות",kcal:29,p:0.3,c:1.7,f:0},
-  {name:"יין לבן",cat:"משקאות",kcal:82,p:0.1,c:2.6,f:0},
-  {name:"שייק חלבון (אבקה + חלב)",cat:"משקאות",kcal:180,p:25,c:10,f:3,perServing:true},
-  {name:"תה ירוק",cat:"משקאות",kcal:1,p:0,c:0,f:0},
-  {name:"מיץ לימון סחוט",cat:"משקאות",kcal:22,p:0.4,c:6.9,f:0.2}
+  {name:"מיץ ענבים",cat:"משקאות",kcal:60,p:0.4,c:15,f:0.1,fi:0.1},
+  {name:"סודה/מים מוגזים",cat:"משקאות",kcal:0,p:0,c:0,f:0,fi:0},
+  {name:"בירה לייט",cat:"משקאות",kcal:29,p:0.3,c:1.7,f:0,fi:0},
+  {name:"יין לבן",cat:"משקאות",kcal:82,p:0.1,c:2.6,f:0,fi:0},
+  {name:"שייק חלבון (אבקה + חלב)",cat:"משקאות",kcal:180,p:25,c:10,f:3,fi:1.0,perServing:true},
+  {name:"תה ירוק",cat:"משקאות",kcal:1,p:0,c:0,f:0,fi:0},
+  {name:"מיץ לימון סחוט",cat:"משקאות",kcal:22,p:0.4,c:6.9,f:0.2,fi:0.3}
 ];
 
 const STORAGE_BASE = "calTracker_v1";
@@ -1350,6 +1429,16 @@ function loadUserData(){
   bmiData = loadBmi();
   allData = loadAll();
   customFoods = loadCustomFoods();
+  if(!bmiData.achCounters){
+    bmiData.achCounters = { photoScans:0, barcodeScans:0, aiQuestions:0, aiDayAnalyses:0 };
+  }
+}
+
+function bumpAchievement(key){
+  if(!bmiData.achCounters) bmiData.achCounters = { photoScans:0, barcodeScans:0, aiQuestions:0, aiDayAnalyses:0 };
+  bmiData.achCounters[key] = (bmiData.achCounters[key] || 0) + 1;
+  saveBmi(bmiData);
+  renderBadges();
 }
 
 function initials(name){
@@ -1484,9 +1573,9 @@ function render(){
 
   const day = getDayData(currentOffset);
   const totals = day.log.reduce((acc,item)=>{
-    acc.kcal += item.kcal; acc.p += item.p; acc.c += item.c; acc.f += item.f;
+    acc.kcal += item.kcal; acc.p += item.p; acc.c += item.c; acc.f += item.f; acc.fi += (item.fi||0);
     return acc;
-  }, {kcal:0,p:0,c:0,f:0});
+  }, {kcal:0,p:0,c:0,f:0,fi:0});
 
   const burnTotal = day.activities.reduce((s,a)=>s+a.burn, 0);
   const adjustedGoal = day.goal + burnTotal;
@@ -1527,6 +1616,11 @@ function render(){
   document.getElementById('fatGoal').textContent = fatGoal;
   document.getElementById('fatFill').style.width = Math.min(100, Math.round((totals.f/fatGoal)*100) || 0) + '%';
 
+  const fiberGoal = Math.round((adjustedGoal / 1000) * 14);
+  document.getElementById('fiberTotal').textContent = Math.round(totals.fi);
+  document.getElementById('fiberGoal').textContent = fiberGoal;
+  document.getElementById('fiberFill').style.width = Math.min(100, Math.round((totals.fi/fiberGoal)*100) || 0) + '%';
+
   document.getElementById('receiptSub').textContent = dayLabelText(currentOffset) + ' · ' + day.log.length + ' פריטים';
   const logList = document.getElementById('logList');
   if(day.log.length === 0){
@@ -1564,6 +1658,8 @@ function render(){
   renderExercise(day);
   renderWeightCard(day);
   renderAnchorList(day);
+  renderBadges();
+  renderVisualDiary(day);
 }
 
 function renderExercise(day){
@@ -1616,6 +1712,94 @@ function renderBmi(){
   catEl.textContent = cat;
   catEl.className = 'bmi-cat ' + cls;
 }
+
+// ---------- Achievement badges ----------
+const BADGES = [
+  { id:'first_food', emoji:'🌱', title:'תחילת הדרך', check: stats => stats.totalFoodLogs >= 1 },
+  { id:'first_weight', emoji:'⚖️', title:'מדידה ראשונה', check: stats => stats.weightEntries >= 1 },
+  { id:'meals_10', emoji:'🍽️', title:'10 ארוחות', check: stats => stats.totalFoodLogs >= 10 },
+  { id:'meals_50', emoji:'🍲', title:'50 ארוחות', check: stats => stats.totalFoodLogs >= 50 },
+  { id:'photo_5', emoji:'📸', title:'5 צילומי מזון', check: stats => stats.photoScans >= 5 },
+  { id:'barcode_10', emoji:'📊', title:'10 סריקות ברקוד', check: stats => stats.barcodeScans >= 10 },
+  { id:'water_goal', emoji:'💧', title:'יעד מים הושג', check: stats => stats.waterGoalHit },
+  { id:'kg_1', emoji:'🎉', title:'ק"ג ראשון למטה', check: stats => stats.lastMilestoneKg >= 1 },
+  { id:'kg_5', emoji:'🏆', title:'5 ק"ג למטה', check: stats => stats.lastMilestoneKg >= 5 },
+  { id:'ai_question', emoji:'🤖', title:'שאלת AI ראשונה', check: stats => stats.aiQuestions >= 1 },
+  { id:'ai_analysis', emoji:'🔍', title:'ניתוח יום ראשון', check: stats => stats.aiDayAnalyses >= 1 },
+  { id:'weight_10', emoji:'📈', title:'10 מדידות משקל', check: stats => stats.weightEntries >= 10 },
+];
+
+function computeAchievementStats(){
+  const counters = bmiData.achCounters || { photoScans:0, barcodeScans:0, aiQuestions:0, aiDayAnalyses:0 };
+  let totalFoodLogs = 0;
+  let waterGoalHit = false;
+  Object.keys(allData).forEach(key=>{
+    if(key === '__defaultGoal') return;
+    const d = allData[key];
+    if(d && Array.isArray(d.log)) totalFoodLogs += d.log.length;
+    if(d && d.waterCups >= WATER_GOAL) waterGoalHit = true;
+  });
+  return {
+    totalFoodLogs,
+    weightEntries: getFullWeightSeries().length,
+    photoScans: counters.photoScans || 0,
+    barcodeScans: counters.barcodeScans || 0,
+    aiQuestions: counters.aiQuestions || 0,
+    aiDayAnalyses: counters.aiDayAnalyses || 0,
+    waterGoalHit,
+    lastMilestoneKg: bmiData.lastMilestoneKg || 0
+  };
+}
+
+function renderBadges(){
+  const grid = document.getElementById('badgesGrid');
+  if(!grid) return;
+  const stats = computeAchievementStats();
+  let earnedCount = 0;
+  grid.innerHTML = BADGES.map(b=>{
+    const earned = b.check(stats);
+    if(earned) earnedCount++;
+    return `
+      <div class="badge-item${earned?' earned':''}" title="${escapeHtml(b.title)}">
+        <div class="b-emoji">${b.emoji}</div>
+        <div class="b-title">${escapeHtml(b.title)}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('badgesEarnedCount').textContent = earnedCount;
+  document.getElementById('badgesTotalCount').textContent = BADGES.length;
+}
+
+// ---------- Visual diary ----------
+function renderVisualDiary(day){
+  const wrap = document.getElementById('visualDiaryWrap');
+  if(!wrap) return;
+  const withPhotos = (day.log || []).filter(item => item.photoThumb);
+  if(withPhotos.length === 0){
+    wrap.innerHTML = '<div class="diary-empty">אין עדיין תמונות ליום הזה — צלם/י מזון בדף "הוספת מזון" כדי לראות אותן כאן</div>';
+    return;
+  }
+  wrap.innerHTML = `<div class="diary-gallery">${withPhotos.map((item, i) => `
+    <div class="diary-thumb tap" data-idx="${i}">
+      <img src="${item.photoThumb}" alt="${escapeHtml(item.name)}">
+      <div class="dt-name">${escapeHtml(item.name)}</div>
+    </div>
+  `).join('')}</div>`;
+  wrap.querySelectorAll('.diary-thumb').forEach((el, i)=>{
+    el.addEventListener('click', ()=>{
+      const item = withPhotos[i];
+      document.getElementById('diaryLightboxImg').src = item.photoThumb;
+      document.getElementById('diaryLightboxCaption').textContent = `${item.name} · ${Math.round(item.kcal)} קק"ל`;
+      document.getElementById('diaryLightbox').classList.remove('hidden');
+    });
+  });
+}
+document.getElementById('diaryLightboxClose').addEventListener('click', ()=>{
+  document.getElementById('diaryLightbox').classList.add('hidden');
+});
+document.getElementById('diaryLightbox').addEventListener('click', (e)=>{
+  if(e.target.id === 'diaryLightbox') document.getElementById('diaryLightbox').classList.add('hidden');
+});
 
 // ---------- Daily weight tracking ----------
 function renderWeightCard(day){
@@ -2008,13 +2192,13 @@ function buildMenu(targetKcal, day, preference){
   const remainingBudget = Math.max(80, targetKcal - anchorTotal);
 
   const mealsOut = {};
-  let grandTotal = { kcal:0, p:0, c:0, f:0 };
+  let grandTotal = { kcal:0, p:0, c:0, f:0, fi:0 };
 
   // Anchored meals: fixed, exactly as the user specified
   Object.keys(anchors).forEach(mealTitle=>{
     const a = anchors[mealTitle];
-    mealsOut[mealTitle] = [{ name:a.name, grams:a.grams, kcal:a.kcal, p:a.p, c:a.c, f:a.f, anchored:true }];
-    grandTotal.kcal += a.kcal; grandTotal.p += a.p; grandTotal.c += a.c; grandTotal.f += a.f;
+    mealsOut[mealTitle] = [{ name:a.name, grams:a.grams, kcal:a.kcal, p:a.p, c:a.c, f:a.f, fi:a.fi||0, anchored:true }];
+    grandTotal.kcal += a.kcal; grandTotal.p += a.p; grandTotal.c += a.c; grandTotal.f += a.f; grandTotal.fi += (a.fi||0);
   });
 
   // Remaining meals: from the template, skipping anything already eaten today, scaled to fit the leftover budget
@@ -2033,9 +2217,9 @@ function buildMenu(targetKcal, day, preference){
     mealsOut[mealTitle] = items.map(it=>{
       const scaledGrams = Math.max(5, Math.round(it.grams*scale/5)*5);
       const factor = scaledGrams/100;
-      const kcal = it.food.kcal*factor, p = it.food.p*factor, c = it.food.c*factor, f = it.food.f*factor;
-      grandTotal.kcal += kcal; grandTotal.p += p; grandTotal.c += c; grandTotal.f += f;
-      return { name: it.food.name, grams: scaledGrams, kcal, p, c, f };
+      const kcal = it.food.kcal*factor, p = it.food.p*factor, c = it.food.c*factor, f = it.food.f*factor, fi = (it.food.fi||0)*factor;
+      grandTotal.kcal += kcal; grandTotal.p += p; grandTotal.c += c; grandTotal.f += f; grandTotal.fi += fi;
+      return { name: it.food.name, grams: scaledGrams, kcal, p, c, f, fi };
     });
   });
 
@@ -2093,7 +2277,7 @@ document.getElementById('menuSuggestBtn').addEventListener('click', ()=>{
     const d = getDayData(currentOffset);
     MEAL_SLOTS.filter(m => menu.meals[m]).forEach(mealTitle=>{
       menu.meals[mealTitle].forEach(it=>{
-        d.log.push({ name: it.name, qtyLabel: `${it.grams} גרם (${mealTitle})`, kcal: it.kcal, p: it.p, c: it.c, f: it.f });
+        d.log.push({ name: it.name, qtyLabel: `${it.grams} גרם (${mealTitle})`, kcal: it.kcal, p: it.p, c: it.c, f: it.f, fi: it.fi||0 });
       });
     });
     saveAll(allData);
@@ -2149,7 +2333,8 @@ document.getElementById('anchorAddBtn').addEventListener('click', ()=>{
     kcal: selectedAnchorFood.kcal * factor,
     p: selectedAnchorFood.p * factor,
     c: selectedAnchorFood.c * factor,
-    f: selectedAnchorFood.f * factor
+    f: selectedAnchorFood.f * factor,
+    fi: (selectedAnchorFood.fi||0) * factor
   };
   saveAll(allData);
   selectedAnchorFood = null;
@@ -2212,6 +2397,7 @@ document.getElementById('aiAskBtn').addEventListener('click', async ()=>{
       throw new Error(data?.error || 'API request failed');
     }
     answerWrap.innerHTML = `<div class="ai-answer">${escapeHtml(data.text || '')}</div>`;
+    bumpAchievement('aiQuestions');
   }catch(err){
     console.error(err);
     if(/load failed|failed to fetch|networkerror/i.test(err.message || '')){
@@ -2235,13 +2421,14 @@ document.getElementById('analyzeDayBtn').addEventListener('click', async ()=>{
   const burnTotal = day.activities.reduce((s,a)=>s+a.burn, 0);
   const adjustedGoal = day.goal + burnTotal;
   const totals = day.log.reduce((acc,item)=>{
-    acc.kcal += item.kcal; acc.p += item.p; acc.c += item.c; acc.f += item.f;
+    acc.kcal += item.kcal; acc.p += item.p; acc.c += item.c; acc.f += item.f; acc.fi += (item.fi||0);
     return acc;
-  }, {kcal:0,p:0,c:0,f:0});
+  }, {kcal:0,p:0,c:0,f:0,fi:0});
   const weightKg = parseFloat(bmiData.weight) || null;
   const proteinGoal = weightKg ? Math.round(weightKg * 1.8) : Math.round((adjustedGoal * 0.30) / 4);
   const fatGoal = Math.round((adjustedGoal * 0.25) / 9);
   const carbGoal = Math.max(0, Math.round((adjustedGoal - proteinGoal*4 - fatGoal*9) / 4));
+  const fiberGoal = Math.round((adjustedGoal / 1000) * 14);
 
   wrap.innerHTML = '<div class="ai-answer-loading"><div class="spinner"></div>מנתח את היום שלך...</div>';
 
@@ -2252,7 +2439,7 @@ document.getElementById('analyzeDayBtn').addEventListener('click', async ()=>{
       body: JSON.stringify({
         items: day.log.map(i => ({ name: i.name, qtyLabel: i.qtyLabel, kcal: i.kcal })),
         totals,
-        goals: { kcalGoal: Math.round(adjustedGoal), proteinGoal, carbGoal, fatGoal }
+        goals: { kcalGoal: Math.round(adjustedGoal), proteinGoal, carbGoal, fatGoal, fiberGoal }
       })
     });
     const data = await response.json();
@@ -2260,6 +2447,7 @@ document.getElementById('analyzeDayBtn').addEventListener('click', async ()=>{
       throw new Error(data?.error || 'API request failed');
     }
     wrap.innerHTML = `<div class="ai-answer">${escapeHtml(data.text || '')}</div>`;
+    bumpAchievement('aiDayAnalyses');
   }catch(err){
     console.error(err);
     if(/load failed|failed to fetch|networkerror/i.test(err.message || '')){
@@ -2275,6 +2463,49 @@ document.getElementById('analyzeDayBtn').addEventListener('click', async ()=>{
 // ---------- Search ----------
 const searchInput = document.getElementById('foodSearch');
 const resultsBox = document.getElementById('searchResults');
+
+// ---------- Voice search ----------
+const voiceBtn = document.getElementById('voiceSearchBtn');
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+if(!SpeechRecognitionAPI){
+  voiceBtn.style.display = 'none';
+} else {
+  let recognition = null;
+  let isListening = false;
+  voiceBtn.addEventListener('click', ()=>{
+    if(isListening){
+      recognition && recognition.stop();
+      return;
+    }
+    recognition = new SpeechRecognitionAPI();
+    recognition.lang = 'he-IL';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    isListening = true;
+    voiceBtn.classList.add('listening');
+    recognition.addEventListener('result', (e)=>{
+      const transcript = e.results[0][0].transcript;
+      searchInput.value = transcript;
+      searchInput.dispatchEvent(new Event('input'));
+    });
+    recognition.addEventListener('error', (e)=>{
+      if(e.error !== 'aborted' && e.error !== 'no-speech'){
+        alert('לא הצלחתי לזהות דיבור. נסה שוב או הקלד ידנית.');
+      }
+    });
+    recognition.addEventListener('end', ()=>{
+      isListening = false;
+      voiceBtn.classList.remove('listening');
+    });
+    try{
+      recognition.start();
+    }catch(err){
+      isListening = false;
+      voiceBtn.classList.remove('listening');
+    }
+  });
+}
+
 searchInput.addEventListener('input', ()=>{
   const q = searchInput.value.trim();
   if(q.length < 1){ resultsBox.innerHTML = ''; return; }
@@ -2306,7 +2537,7 @@ function openQtySheet(food){
   document.getElementById('qtyFoodName').textContent = food.name;
   const unitLabel = food.unitLabel || (food.perServing ? 'מנה' : '100 גרם');
   document.getElementById('qtyFoodMeta').textContent =
-    `${food.kcal} קק"ל ל-${unitLabel} · חלבון ${food.p}g · פחמימה ${food.c}g · שומן ${food.f}g`;
+    `${food.kcal} קק"ל ל-${unitLabel} · חלבון ${food.p}g · פחמימה ${food.c}g · שומן ${food.f}g · סיבים ${food.fi||0}g`;
   qtyInput.value = (food.perServing || food.unitLabel) ? (food.defaultQty || 1) : 100;
   document.querySelector('.qty-unit').textContent = food.unitLabel || (food.perServing ? 'מנות' : 'גרם');
   updateQtyPreview();
@@ -2315,7 +2546,27 @@ function openQtySheet(food){
 function updateQtyPreview(){
   const qty = parseFloat(qtyInput.value) || 0;
   const factor = (selectedFood.perServing || selectedFood.unitLabel) ? qty : (qty/100);
-  document.getElementById('qtyKcalPreview').textContent = Math.round(selectedFood.kcal * factor);
+  const itemKcal = selectedFood.kcal * factor;
+  document.getElementById('qtyKcalPreview').textContent = Math.round(itemKcal);
+
+  const day = getDayData(currentOffset);
+  const burnTotal = (day.activities||[]).reduce((s,a)=>s+a.burn, 0);
+  const adjustedGoal = Math.round((day.goal||0) + burnTotal) || 1;
+  const consumedSoFar = (day.log||[]).reduce((s,i)=>s+i.kcal, 0);
+  const resultingTotal = consumedSoFar + itemKcal;
+  const remaining = adjustedGoal - resultingTotal;
+  const pct = Math.min(100, Math.round((resultingTotal/adjustedGoal)*100) || 0);
+  const isOver = remaining < 0;
+
+  document.getElementById('whatifTotal').textContent = `${Math.round(resultingTotal)} / ${adjustedGoal} קק"ל`;
+  const fillEl = document.getElementById('whatifFill');
+  fillEl.style.width = pct + '%';
+  fillEl.classList.toggle('over', isOver);
+  const remainEl = document.getElementById('whatifRemain');
+  remainEl.className = 'whatif-remain ' + (isOver ? 'over' : 'ok');
+  remainEl.textContent = isOver
+    ? `⚠️ תהיה חריגה של ${Math.round(-remaining)} קק"ל מהיעד`
+    : `יישארו לך ${Math.round(remaining)} קק"ל להמשך היום`;
 }
 qtyInput.addEventListener('input', updateQtyPreview);
 document.getElementById('qtyMinus').addEventListener('click', ()=>{
@@ -2340,7 +2591,8 @@ document.getElementById('qtyConfirm').addEventListener('click', ()=>{
     kcal: selectedFood.kcal * factor,
     p: selectedFood.p * factor,
     c: selectedFood.c * factor,
-    f: selectedFood.f * factor
+    f: selectedFood.f * factor,
+    fi: (selectedFood.fi||0) * factor
   });
   saveAll(allData);
   qtyOverlay.classList.add('hidden');
@@ -2363,6 +2615,7 @@ function openEditLogItem(idx){
     item.baseP = item.p;
     item.baseC = item.c;
     item.baseF = item.f;
+    item.baseFi = item.fi || 0;
     item.baseQtyLabel = item.qtyLabel;
     item.qtyMultiplier = item.qtyMultiplier || 1;
   }
@@ -2401,6 +2654,7 @@ document.getElementById('editQtySave').addEventListener('click', ()=>{
   item.p = item.baseP * mult;
   item.c = item.baseC * mult;
   item.f = item.baseF * mult;
+  item.fi = (item.baseFi||0) * mult;
   item.qtyLabel = mult === 1 ? item.baseQtyLabel : `${item.baseQtyLabel} (×${mult})`;
   saveAll(allData);
   editQtyOverlay.classList.add('hidden');
@@ -2424,7 +2678,7 @@ document.getElementById('quickAddOmelette').addEventListener('click', ()=>{
 // ---------- Custom food ----------
 const customOverlay = document.getElementById('customOverlay');
 document.getElementById('addCustomBtn').addEventListener('click', ()=>{
-  ['cfName','cfKcal','cfProtein','cfCarb','cfFat'].forEach(id => document.getElementById(id).value = '');
+  ['cfName','cfKcal','cfProtein','cfCarb','cfFat','cfFiber'].forEach(id => document.getElementById(id).value = '');
   customOverlay.classList.remove('hidden');
 });
 document.getElementById('cfCancel').addEventListener('click', ()=> customOverlay.classList.add('hidden'));
@@ -2434,11 +2688,12 @@ document.getElementById('cfSave').addEventListener('click', ()=>{
   const p = parseFloat(document.getElementById('cfProtein').value) || 0;
   const c = parseFloat(document.getElementById('cfCarb').value) || 0;
   const f = parseFloat(document.getElementById('cfFat').value) || 0;
+  const fi = parseFloat(document.getElementById('cfFiber').value) || 0;
   if(!name || kcal <= 0){
     alert('נא למלא שם וכמות קלוריות תקינה');
     return;
   }
-  const food = {name, cat:'מותאם אישית', kcal, p, c, f};
+  const food = {name, cat:'מותאם אישית', kcal, p, c, f, fi};
   customFoods.push(food);
   saveCustomFoods(customFoods);
   customOverlay.classList.add('hidden');
@@ -2602,6 +2857,25 @@ const photoInputGallery = document.getElementById('photoInputGallery');
 const photoStatus = document.getElementById('photoStatus');
 const photoReviewOverlay = document.getElementById('photoReviewOverlay');
 let detectedItems = [];
+let lastPhotoThumb = null;
+
+function makeThumbnail(file){
+  return new Promise((resolve)=>{
+    const img = new Image();
+    img.onload = () => {
+      const maxSize = 160;
+      let w = img.width, h = img.height;
+      if(w > h){ h = Math.round(h * maxSize/w); w = maxSize; }
+      else { w = Math.round(w * maxSize/h); h = maxSize; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.5));
+    };
+    img.onerror = () => resolve(null);
+    img.src = URL.createObjectURL(file);
+  });
+}
 
 photoBtnCamera.addEventListener('click', ()=> photoInputCamera.click());
 photoBtnGallery.addEventListener('click', ()=> photoInputGallery.click());
@@ -2651,13 +2925,15 @@ async function handlePhotoFile(file, inputEl){
       kcal: it.kcal || 0,
       p: it.protein || 0,
       c: it.carbs || 0,
-      f: it.fat || 0
+      f: it.fat || 0,
+      fi: it.fiber || 0
     }));
     photoStatus.innerHTML = '';
     if(detectedItems.length === 0){
       alert('לא זוהה מזון בתמונה. נסה תמונה ברורה יותר.');
       return;
     }
+    lastPhotoThumb = await makeThumbnail(file);
     openPhotoReview();
   }catch(err){
     console.error(err);
@@ -2712,9 +2988,9 @@ function updateMealSummary(){
   }
   const totals = checked.reduce((acc, idx)=>{
     const it = detectedItems[idx];
-    acc.kcal += it.kcal; acc.p += it.p; acc.c += it.c; acc.f += it.f;
+    acc.kcal += it.kcal; acc.p += it.p; acc.c += it.c; acc.f += it.f; acc.fi += (it.fi||0);
     return acc;
-  }, { kcal:0, p:0, c:0, f:0 });
+  }, { kcal:0, p:0, c:0, f:0, fi:0 });
   summaryEl.innerHTML = `
     <div class="ms-title">סיכום תזונתי לארוחה (${checked.length} פריטים נבחרים)</div>
     <div class="ms-kcal">${Math.round(totals.kcal)} קק"ל</div>
@@ -2722,6 +2998,7 @@ function updateMealSummary(){
       <div class="ms-macro"><div class="v">${Math.round(totals.p)}g</div><div class="k">חלבון</div></div>
       <div class="ms-macro"><div class="v">${Math.round(totals.c)}g</div><div class="k">פחמימה</div></div>
       <div class="ms-macro"><div class="v">${Math.round(totals.f)}g</div><div class="k">שומן</div></div>
+      <div class="ms-macro"><div class="v">${Math.round(totals.fi)}g</div><div class="k">סיבים</div></div>
     </div>
   `;
 }
@@ -2735,10 +3012,12 @@ document.getElementById('photoReviewConfirm').addEventListener('click', ()=>{
     day.log.push({
       name: it.name,
       qtyLabel: `~${it.grams} גרם (זוהה מתמונה)`,
-      kcal: it.kcal, p: it.p, c: it.c, f: it.f
+      kcal: it.kcal, p: it.p, c: it.c, f: it.f, fi: it.fi||0,
+      photoThumb: lastPhotoThumb || null
     });
   });
   saveAll(allData);
+  bumpAchievement('photoScans');
   photoReviewOverlay.classList.add('hidden');
   render();
 });
@@ -2832,6 +3111,7 @@ async function lookupBarcode(barcode){
     let protein100 = n['proteins_100g'];
     let carbs100 = n['carbohydrates_100g'];
     let fat100 = n['fat_100g'];
+    let fiber100 = n['fiber_100g'];
 
     // Fallback: some products only list totals for the whole package.
     // In that case, compute "total calories ÷ package weight × 100" to get true per-100g values.
@@ -2846,6 +3126,7 @@ async function lookupBarcode(barcode){
         if(protein100 == null && n['proteins'] != null) protein100 = n['proteins'] * ratio;
         if(carbs100 == null && n['carbohydrates'] != null) carbs100 = n['carbohydrates'] * ratio;
         if(fat100 == null && n['fat'] != null) fat100 = n['fat'] * ratio;
+        if(fiber100 == null && n['fiber'] != null) fiber100 = n['fiber'] * ratio;
       }
     }
 
@@ -2858,8 +3139,10 @@ async function lookupBarcode(barcode){
       kcal: kcal100,
       p: protein100 ?? 0,
       c: carbs100 ?? 0,
-      f: fat100 ?? 0
+      f: fat100 ?? 0,
+      fi: fiber100 ?? 0
     };
+    bumpAchievement('barcodeScans');
     openQtySheet(food);
   }catch(err){
     photoStatus.innerHTML = '';
