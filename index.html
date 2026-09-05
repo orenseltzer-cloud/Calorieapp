@@ -228,6 +228,7 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .weight-chart-svg{width:100%;height:auto;display:block;}
 .weight-chart-empty{text-align:center;padding:24px 10px;color:var(--ink-soft);font-size:12.5px;}
 .weight-chart-axis{font-family:var(--font-mono);font-size:9px;fill:var(--ink-soft);}
+.weight-chart-tip{font-family:var(--font-mono);font-size:10px;font-weight:700;fill:var(--ink);}
 .weight-success{
   background:var(--cream);border:1.5px solid var(--turmeric);border-radius:var(--radius-sm);
   padding:8px 12px;font-size:12px;
@@ -245,7 +246,7 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .weight-feedback.neutral{background:var(--cream);color:var(--ink-soft);border:1.5px solid var(--line);}
 @keyframes feedbackIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
 
-/* ---------- Menu suggestion & craving buster ---------- */
+/* ---------- Menu suggestion ---------- */
 .menu-meal{margin-bottom:var(--space-3);padding-bottom:var(--space-3);border-bottom:1px dashed var(--line);}
 .menu-meal:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}
 .menu-meal-title{font-size:12.5px;font-weight:700;color:var(--herb);margin-bottom:6px;}
@@ -254,11 +255,6 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .menu-total-row{display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3);padding-top:var(--space-3);border-top:2px solid var(--ink);font-weight:700;font-size:14px;}
 .menu-total-row span:last-child{font-family:var(--font-mono);}
 .menu-actions{display:flex;gap:var(--space-2);margin-top:var(--space-3);}
-.craving-card{background:var(--cream);border-radius:var(--radius-sm);padding:var(--space-3) 14px;}
-.craving-card .cc-name{font-weight:700;font-size:15px;}
-.craving-card .cc-kcal{font-family:var(--font-mono);font-weight:700;color:var(--herb);font-size:14px;margin-top:2px;}
-.craving-card .cc-note{font-size:12px;color:var(--ink-soft);margin-top:6px;line-height:1.4;}
-.craving-card button{margin-top:var(--space-3);width:100%;}
 
 /* ---------- AI consultation ---------- */
 .ai-question-box{
@@ -515,8 +511,8 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
 .tab-bar{display:flex;gap:6px;margin-bottom:var(--space-4);}
 .tab-btn{
   flex:1;padding:11px 4px;border:none;border-radius:var(--radius-sm);background:var(--card);
-  color:var(--ink-soft);font-family:inherit;font-size:12px;font-weight:700;text-align:center;
-  box-shadow:var(--shadow-card);white-space:nowrap;min-height:44px;
+  color:var(--ink-soft);font-family:inherit;font-size:20px;font-weight:700;text-align:center;
+  box-shadow:var(--shadow-card);white-space:nowrap;min-height:44px;line-height:1;
 }
 .tab-btn.active{background:var(--herb);color:#fff;box-shadow:none;}
 .pager{
@@ -586,16 +582,17 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
   </div>
 
   <div class="tab-bar">
-    <button class="tab-btn active" data-page="0">משקל ופרופיל</button>
-    <button class="tab-btn" data-page="1">היום</button>
-    <button class="tab-btn" data-page="2">הוספת מזון</button>
-    <button class="tab-btn" data-page="3">אימון</button>
-    <button class="tab-btn" data-page="4">מונחים</button>
+    <button class="tab-btn active" data-page="0" aria-label="מסך בית">🏠</button>
+    <button class="tab-btn" data-page="1" aria-label="היום">📅</button>
+    <button class="tab-btn" data-page="2" aria-label="הוספת מזון">🍽️</button>
+    <button class="tab-btn" data-page="3" aria-label="התייעצות AI">🤖</button>
+    <button class="tab-btn" data-page="4" aria-label="אימון">🏃</button>
+    <button class="tab-btn" data-page="5" aria-label="מונחים">📖</button>
   </div>
 
   <div class="pager" id="pager">
 
-    <!-- Page 1: Weight & profile -->
+    <!-- Page 1: Home (weight & profile) -->
     <section class="page">
       <div class="card">
         <h2>מעקב משקל יומי</h2>
@@ -846,7 +843,10 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
         <button class="calc-btn" id="menuSuggestBtn">הצע לי תפריט להיום</button>
         <div id="menuSuggestion" style="margin-top:var(--space-3);"></div>
       </div>
+    </section>
 
+    <!-- Page 4: AI consultation -->
+    <section class="page">
       <div class="card">
         <h2>🤖 התייעצות עם AI</h2>
         <div class="bmi-hint" style="margin-bottom:var(--space-3);">שאל שאלה חופשית על התזונה שלך היום — למשל "מה כדאי לי לאכול הערב אם נשארו לי 300 קלוריות ולא בא לי עוף?"</div>
@@ -854,19 +854,9 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
         <button class="calc-btn" id="aiAskBtn" style="margin-top:var(--space-2);">שאל</button>
         <div id="aiAnswerWrap"></div>
       </div>
-
-      <div class="card">
-        <h2>רגע חולשה? 😅</h2>
-        <div class="bmi-hint" style="margin-bottom:var(--space-3);">מתחשק לך משהו בלי לפרק את הדיאטה? הנה רעיון</div>
-        <div class="photo-btn-row">
-          <button class="photo-btn" id="cravingSweetBtn">🍬 מתוק</button>
-          <button class="photo-btn gallery" id="cravingSaltyBtn">🧂 מלוח</button>
-        </div>
-        <div id="cravingSuggestion" style="margin-top:var(--space-3);"></div>
-      </div>
     </section>
 
-    <!-- Page 4: Exercise -->
+    <!-- Page 5: Exercise -->
     <section class="page">
       <div class="card">
         <h2>תכנון אימון להיום</h2>
@@ -893,7 +883,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
       </div>
     </section>
 
-    <!-- Page 5: Glossary -->
+    <!-- Page 6: Glossary -->
     <section class="page">
       <div class="card">
         <h2>פירוש מונחים</h2>
@@ -936,6 +926,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
 
   <div class="pager-dots" id="pagerDots">
     <div class="pager-dot active"></div>
+    <div class="pager-dot"></div>
     <div class="pager-dot"></div>
     <div class="pager-dot"></div>
     <div class="pager-dot"></div>
@@ -1718,13 +1709,23 @@ function renderWeightChart(){
   const yMax = padTop;
   const yMin = padTop + plotH;
 
+  const lastPoint = points[points.length-1];
   const circles = points.map((p,i)=>{
     const isLast = i === points.length - 1;
-    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${isLast?4.5:2.8}" fill="${isLast?'var(--paprika)':'var(--herb)'}" stroke="var(--card)" stroke-width="${isLast?1.5:1}" />`;
+    return `<circle class="wc-point" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${isLast?4.5:2.8}" fill="${isLast?'var(--paprika)':'var(--herb)'}" stroke="var(--card)" stroke-width="${isLast?1.5:1}" data-date="${p.date}" data-weight="${p.weight}" data-x="${p.x.toFixed(1)}" data-y="${p.y.toFixed(1)}" style="cursor:pointer;" />`;
   }).join('');
 
+  function tooltipLabel(p){
+    const anchorEnd = p.x > W/2;
+    const tx = anchorEnd ? p.x - 6 : p.x + 6;
+    const ty = p.y > padTop + 14 ? p.y - 9 : p.y + 16;
+    return `<g id="wcTooltip">
+      <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" class="weight-chart-tip" text-anchor="${anchorEnd?'end':'start'}">${formatShortDate(p.date)} · ${p.weight.toFixed(1)} ק"ג</text>
+    </g>`;
+  }
+
   wrap.innerHTML = `
-    <svg class="weight-chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+    <svg class="weight-chart-svg" id="weightChartSvg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
       <line x1="${padLeft}" y1="${yMax}" x2="${W-padRight}" y2="${yMax}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3"/>
       <line x1="${padLeft}" y1="${yMin}" x2="${W-padRight}" y2="${yMin}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3"/>
       <path d="${areaD}" fill="var(--cream)" stroke="none"/>
@@ -1736,8 +1737,18 @@ function renderWeightChart(){
         ? `<text x="${W-padRight}" y="${padTop + plotH/2 - 10}" class="weight-chart-axis" text-anchor="end">${maxW.toFixed(1)} ק"ג</text>`
         : `<text x="${W-padRight}" y="${yMax-8}" class="weight-chart-axis" text-anchor="end">${maxW.toFixed(1)} ק"ג</text>
       <text x="${W-padRight}" y="${yMin+16}" class="weight-chart-axis" text-anchor="end">${minW.toFixed(1)} ק"ג</text>`}
+      ${tooltipLabel(lastPoint)}
     </svg>
+    <div class="bmi-hint" style="text-align:center;margin-top:4px;">הקש/י על נקודה בגרף לראות תאריך ומשקל מדויקים</div>
   `;
+  document.getElementById('weightChartSvg').querySelectorAll('.wc-point').forEach(circle=>{
+    circle.addEventListener('click', ()=>{
+      const p = { x: parseFloat(circle.dataset.x), y: parseFloat(circle.dataset.y), date: circle.dataset.date, weight: parseFloat(circle.dataset.weight) };
+      const oldTip = document.getElementById('wcTooltip');
+      if(oldTip) oldTip.remove();
+      document.getElementById('weightChartSvg').insertAdjacentHTML('beforeend', tooltipLabel(p));
+    });
+  });
   summary.className = 'bmi-hint' + (totalDiff > 0 ? ' weight-success' : '');
   summary.innerHTML = `<span style="color:${diffColor};font-weight:700;">${diffLabel}</span> מאז ${startingLabel} (${fullSeries.length} מדידות בסה"כ)`;
 }
@@ -2157,56 +2168,6 @@ function renderAnchorList(day){
     });
   });
 }
-
-// ---------- Craving buster ----------
-const CRAVING_SWEET = [
-  { name:"2 תמרים", kcal:110, p:1, c:29, f:0.1, note:"מתיקות טבעית וסיבים תזונתיים — עוזר לרוב לעצור את החשק למתוק." },
-  { name:"קובייה שוקולד מריר 70% (10 גרם)", kcal:60, p:0.8, c:4.6, f:4.3, note:"קובייה אחת קטנה מספיקה כדי לספק את התשוקה בלי לפרק את היום." },
-  { name:"יוגורט 3% עם קינמון", kcal:90, p:3.5, c:5, f:3.3, note:"טעם מתוק-חמצמץ עם תחושת שובע נעימה." },
-  { name:"תפוח עץ פרוס עם קינמון", kcal:70, p:0.3, c:18, f:0.2, note:"מתיקות טבעית וכרס — פרי שלם עוזר יותר ממיץ." },
-  { name:"2 תמרים ממולאים בשקד", kcal:140, p:2, c:30, f:2.5, note:"תחליף מצוין לממתק — משלב מתיקות וקראנצ'יות." },
-  { name:"תה חם עם קינמון ותפוח", kcal:15, p:0, c:3, f:0, note:"לפעמים החשק הוא לחום ולריח — לא בהכרח לסוכר." },
-  { name:"תות שדה עם קצת דבש", kcal:60, p:0.6, c:14, f:0.2, note:"פרי טרי עם נגיעת מתיקות — מרווה בלי הרבה קלוריות." },
-  { name:"קפה הפוך עם קינמון (ללא סוכר)", kcal:65, p:3, c:5, f:3, note:"תחושת פינוק חמה בלי תוספת סוכר." },
-  { name:"מנגו קפוא (חתיכות)", kcal:60, p:0.8, c:15, f:0.4, note:"מתיקות עזה וקרירה שממכרת פחות מגלידה." },
-  { name:"יוגורט יווני עם ריבת פירות (כפית)", kcal:100, p:9, c:8, f:3, note:"חלבון גבוה עם נגיעת מתיקות מפנקת." },
-  { name:"קוביית מרשמלו (1-2 יח')", kcal:40, p:0.2, c:9, f:0, note:"פינוק קטן וממוקד בלי להתפרק על שקית שלמה." },
-  { name:"ענבים קפואים (חופן)", kcal:35, p:0.3, c:9, f:0.1, note:"כמו סוכריות טבעיות — קרירות ומתוקות ומרגישות כמו כיף." }
-];
-const CRAVING_SALTY = [
-  { name:"מלפפון וגזר עם קורט מלח", kcal:35, p:1, c:7, f:0.2, note:"פריכות ומליחות בלי עומס קלוריות." },
-  { name:"חומוס (2 כפות) עם מלפפון", kcal:90, p:4, c:8, f:5, note:"שילוב חלבון וסיבים ששומר על שובע." },
-  { name:"5 זיתים ירוקים", kcal:40, p:0.3, c:1, f:4, note:"טעם עשיר ומלוח בכמות קטנה." },
-  { name:"פופקורן טבעי ללא חמאה (10 גרם)", kcal:40, p:1.3, c:8, f:0.5, note:"נפח גדול לתחושת אכילה עם קלוריות נמוכות יחסית." },
-  { name:"רייס קייקס (2 יח') עם מעט מלח", kcal:70, p:1.4, c:16, f:0.3, note:"פריכות בלי הרבה קלוריות." },
-  { name:"אדממה מבושל עם מלח (חופן)", kcal:90, p:8, c:7, f:4, note:"חטיף מלוח עם חלבון וסיבים." },
-  { name:"פיצוחי חמנייה קלויים (חופן קטן)", kcal:80, p:3, c:3, f:7, note:"פריכות מספקת בכמות מדודה — הימנע מהשקית השלמה." },
-  { name:"פיתה קטנה עם טחינה דלילה", kcal:110, p:3, c:16, f:4, note:"שילוב פחמימה קלה עם רוטב עשיר בלי להגזים." },
-  { name:"מלפפון חמוץ בינוני", kcal:12, p:0.5, c:2, f:0, note:"חמיצות ומליחות עזה כמעט בלי קלוריות." },
-  { name:"פריכיות אורז מלא עם אבוקדו מרוח", kcal:120, p:2, c:14, f:6, note:"פריכות עם שומן טוב שמשביע לאורך זמן." },
-  { name:"טונה במים עם קורט מלח וחומץ", kcal:100, p:22, c:0, f:1, note:"חלבון גבוה שמרגיש כמו נשנוש אבל בעצם ארוחה קטנה." },
-  { name:"גזר בייבי עם מעט חרדל", kcal:30, p:0.7, c:6, f:0.3, note:"פריכות ועוקצנות קלה שמפתה במקום צ'יפס." }
-];
-
-function showCraving(list){
-  const item = list[Math.floor(Math.random()*list.length)];
-  document.getElementById('cravingSuggestion').innerHTML = `
-    <div class="craving-card">
-      <div class="cc-name">${escapeHtml(item.name)}</div>
-      <div class="cc-kcal">${item.kcal} קק"ל</div>
-      <div class="cc-note">${escapeHtml(item.note)}</div>
-      <button class="use-goal-btn" id="cravingAddBtn">הוסף ליומן</button>
-    </div>
-  `;
-  document.getElementById('cravingAddBtn').addEventListener('click', ()=>{
-    const day = getDayData(currentOffset);
-    day.log.push({ name: item.name, qtyLabel: 'מנה אחת', kcal: item.kcal, p: item.p, c: item.c, f: item.f });
-    saveAll(allData);
-    render();
-  });
-}
-document.getElementById('cravingSweetBtn').addEventListener('click', ()=> showCraving(CRAVING_SWEET));
-document.getElementById('cravingSaltyBtn').addEventListener('click', ()=> showCraving(CRAVING_SALTY));
 
 // ---------- AI consultation ----------
 document.getElementById('aiAskBtn').addEventListener('click', async ()=>{
