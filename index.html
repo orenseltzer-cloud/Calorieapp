@@ -430,6 +430,31 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 
 footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--space-5) var(--space-3) 0;line-height:1.6;}
 
+/* ---------- What's new popup ---------- */
+.whatsnew-overlay{
+  position:fixed;inset:0;background:rgba(25,28,30,.55);z-index:80;
+  display:flex;align-items:center;justify-content:center;padding:var(--space-4);
+}
+.whatsnew-overlay.hidden{display:none;}
+.whatsnew-card{
+  background:var(--card);border-radius:20px;padding:28px 24px;max-width:340px;width:100%;
+  text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.22);animation:milestonePop .4s cubic-bezier(.2,.9,.3,1.3);
+}
+.whatsnew-badge{font-size:44px;margin-bottom:8px;}
+.whatsnew-title{font-family:var(--font-display);font-weight:800;font-size:21px;color:var(--ink);margin-bottom:14px;}
+.whatsnew-list{list-style:none;padding:0;margin:0 0 20px;text-align:right;}
+.whatsnew-list li{
+  font-size:13px;color:var(--ink);padding:8px 0 8px 4px;border-bottom:1px dashed var(--line);
+  display:flex;align-items:flex-start;gap:8px;
+}
+.whatsnew-list li:last-child{border-bottom:none;}
+.whatsnew-list li .wn-emoji{flex-shrink:0;font-size:16px;}
+.whatsnew-close{
+  width:100%;padding:13px;border:none;border-radius:var(--radius-sm);
+  background:var(--herb);color:#fff;font-family:inherit;font-size:14px;font-weight:700;min-height:46px;
+}
+.whatsnew-close:active{background:var(--herb-dark);}
+
 /* ---------- Visual diary ---------- */
 .diary-gallery{display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;}
 .diary-thumb{flex-shrink:0;width:76px;text-align:center;}
@@ -529,6 +554,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
 }
 .login-screen.hidden{display:none;}
 .login-card{width:100%;max-width:420px;}
+.login-logo{display:flex;justify-content:center;margin-bottom:var(--space-4);}
 .login-card .login-title{font-family:var(--font-display);font-weight:800;font-size:30px;text-align:center;margin-bottom:2px;}
 .login-card .login-sub{font-size:13px;color:var(--ink-soft);text-align:center;margin-bottom:var(--space-5);}
 .login-form{background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:var(--space-5) var(--space-4);}
@@ -589,6 +615,16 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
 <!-- Login screen -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 100 100" width="112" height="112">
+        <circle cx="50" cy="50" r="48" fill="var(--herb)"/>
+        <rect x="21" y="46" width="58" height="36" rx="9" fill="#fff"/>
+        <circle cx="50" cy="46" r="17" fill="var(--herb)" stroke="#fff" stroke-width="4"/>
+        <line x1="50" y1="46" x2="41" y2="56" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+        <circle cx="50" cy="46" r="2.6" fill="#fff"/>
+        <path d="M32 68 L38 62 M68 68 L62 62" stroke="var(--herb)" stroke-width="3.2" stroke-linecap="round"/>
+      </svg>
+    </div>
     <div class="login-title">יורדים בגדול</div>
     <div class="login-sub">כניסה אישית</div>
     <div class="login-form">
@@ -1143,6 +1179,16 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
   <div class="lightbox-caption" id="diaryLightboxCaption"></div>
 </div>
 
+<!-- What's new popup -->
+<div class="whatsnew-overlay hidden" id="whatsNewOverlay">
+  <div class="whatsnew-card">
+    <div class="whatsnew-badge">🎉</div>
+    <div class="whatsnew-title">גרסה חדשה באוויר!</div>
+    <ul class="whatsnew-list" id="whatsNewList"></ul>
+    <button class="whatsnew-close" id="whatsNewCloseBtn">מעולה, בואו נתחיל</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js"></script>
 <script>
 // ---------- Food database (per 100g) ----------
@@ -1425,14 +1471,44 @@ let customFoods = [];
 let currentOffset = 0; // days from today
 let selectedFood = null;
 
+const APP_VERSION = "1.1";
+const WHATS_NEW_ITEMS = [
+  { emoji:"🌾", text:"מעקב סיבים תזונתיים מלא — נוסף לכל מזון במאגר" },
+  { emoji:"🏅", text:"תגי הישג חדשים במסך הבית" },
+  { emoji:"🎤", text:"חיפוש מזון בקול" },
+  { emoji:"🔮", text:"תצוגה מקדימה של \"מה אם\" לפני שמוסיפים מזון" },
+  { emoji:"📷", text:"יומן ויזואלי לתמונות שצולמו" }
+];
+
 function loadUserData(){
+  const rawBmi = localStorage.getItem(userKey(BMI_BASE));
+  const isBrandNewUser = !rawBmi;
   bmiData = loadBmi();
   allData = loadAll();
   customFoods = loadCustomFoods();
   if(!bmiData.achCounters){
     bmiData.achCounters = { photoScans:0, barcodeScans:0, aiQuestions:0, aiDayAnalyses:0 };
   }
+  return isBrandNewUser;
 }
+
+function checkWhatsNew(isBrandNewUser){
+  if(isBrandNewUser){
+    bmiData.lastSeenVersion = APP_VERSION;
+    saveBmi(bmiData);
+    return;
+  }
+  if(bmiData.lastSeenVersion !== APP_VERSION){
+    bmiData.lastSeenVersion = APP_VERSION;
+    saveBmi(bmiData);
+    const list = document.getElementById('whatsNewList');
+    list.innerHTML = WHATS_NEW_ITEMS.map(i => `<li><span class="wn-emoji">${i.emoji}</span><span>${escapeHtml(i.text)}</span></li>`).join('');
+    document.getElementById('whatsNewOverlay').classList.remove('hidden');
+  }
+}
+document.getElementById('whatsNewCloseBtn').addEventListener('click', ()=>{
+  document.getElementById('whatsNewOverlay').classList.add('hidden');
+});
 
 function bumpAchievement(key){
   if(!bmiData.achCounters) bmiData.achCounters = { photoScans:0, barcodeScans:0, aiQuestions:0, aiDayAnalyses:0 };
@@ -1452,7 +1528,7 @@ function enterApp(userId, name){
   currentUserId = userId;
   currentUserName = name;
   localStorage.setItem(SESSION_KEY, JSON.stringify({id:userId, name}));
-  loadUserData();
+  const isBrandNewUser = loadUserData();
   document.getElementById('userNameLabel').textContent = name;
   document.getElementById('userAvatar').textContent = initials(name);
   document.getElementById('loginScreen').classList.add('hidden');
@@ -1460,6 +1536,7 @@ function enterApp(userId, name){
   currentOffset = 0;
   render();
   renderBmi();
+  checkWhatsNew(isBrandNewUser);
 }
 
 function seedDefaultUsers(){
