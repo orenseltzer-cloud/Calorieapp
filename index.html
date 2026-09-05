@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#2B2620">
+<meta name="theme-color" content="#0E6B5C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="יורדים בגדול">
@@ -12,28 +12,28 @@
 <title>יורדים בגדול · יומן קלוריות</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Suez+One&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --cream:#F6F1E3;
-  --cream-deep:#EFE8D4;
-  --line:#E4DAC0;
-  --ink:#2B2620;
-  --ink-soft:#6E6656;
-  --paprika:#C1442A;
-  --paprika-dark:#9A3520;
-  --herb:#3F6B4F;
-  --herb-dark:#325740;
-  --turmeric:#C68A2E;
+  --cream:#F4F5F6;
+  --cream-deep:#E7E9EB;
+  --line:#E2E5E8;
+  --ink:#191C1E;
+  --ink-soft:#667085;
+  --paprika:#D9502E;
+  --paprika-dark:#AE3E22;
+  --herb:#0E6B5C;
+  --herb-dark:#0A5347;
+  --turmeric:#B8860B;
   --card:#FFFFFF;
-  --radius-lg:18px;
+  --radius-lg:16px;
   --radius-md:12px;
   --radius-sm:8px;
-  --shadow-card: 0 1px 2px rgba(43,38,32,0.04), 0 6px 16px rgba(43,38,32,0.06);
-  --shadow-sheet: 0 -8px 30px rgba(43,38,32,0.18);
+  --shadow-card: 0 1px 2px rgba(25,28,30,0.04), 0 4px 12px rgba(25,28,30,0.05);
+  --shadow-sheet: 0 -8px 30px rgba(25,28,30,0.16);
   --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px; --space-6:32px;
   --font-body:'Rubik','Segoe UI',system-ui,sans-serif;
-  --font-display:'Suez One','Rubik',serif;
+  --font-display:'Rubik','Segoe UI',system-ui,sans-serif;
   --font-mono:'JetBrains Mono','Courier New',monospace;
 }
 *{box-sizing:border-box;}
@@ -62,7 +62,7 @@ h1,h2,h3{margin:0;font-family:var(--font-body);}
   padding-bottom:var(--space-4);margin-bottom:var(--space-4);
 }
 .app-header h1{
-  font-family:var(--font-display);font-size:28px;color:var(--ink);line-height:1.1;
+  font-family:var(--font-display);font-weight:800;font-size:26px;color:var(--ink);line-height:1.1;letter-spacing:-.01em;
 }
 .app-header .sub{font-size:13px;color:var(--ink-soft);margin-top:4px;}
 .date-badge{
@@ -225,7 +225,8 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 }
 
 /* ---------- Weight chart ---------- */
-.weight-chart-svg{width:100%;height:auto;display:block;}
+.weight-chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px;}
+.weight-chart-svg{display:block;flex-shrink:0;}
 .weight-chart-empty{text-align:center;padding:24px 10px;color:var(--ink-soft);font-size:12.5px;}
 .weight-chart-axis{font-family:var(--font-mono);font-size:9px;fill:var(--ink-soft);}
 .weight-chart-tip{font-family:var(--font-mono);font-size:10px;font-weight:700;fill:var(--ink);}
@@ -423,7 +424,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
   100%{ transform:scale(1); opacity:1; }
 }
 .milestone-emoji{font-size:52px;margin-bottom:10px;}
-.milestone-title{font-family:var(--font-display);font-size:24px;color:var(--ink);margin-bottom:6px;}
+.milestone-title{font-family:var(--font-display);font-weight:800;font-size:24px;color:var(--ink);margin-bottom:6px;}
 .milestone-sub{font-size:14px;color:var(--ink-soft);line-height:1.5;margin-bottom:20px;}
 .milestone-close{
   width:100%;padding:13px;border:none;border-radius:var(--radius-sm);
@@ -440,7 +441,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
   padding:13px 6px;background:var(--turmeric);color:#fff;border:none;border-radius:var(--radius-sm);
   font-family:inherit;font-size:13px;font-weight:700;min-height:48px;
 }
-.barcode-btn:active{background:#a56f22;}
+.barcode-btn:active{background:#8F6908;}
 .barcode-overlay{
   position:fixed;inset:0;background:#000;z-index:60;display:flex;flex-direction:column;
 }
@@ -482,7 +483,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
 }
 .login-screen.hidden{display:none;}
 .login-card{width:100%;max-width:420px;}
-.login-card .login-title{font-family:var(--font-display);font-size:30px;text-align:center;margin-bottom:2px;}
+.login-card .login-title{font-family:var(--font-display);font-weight:800;font-size:30px;text-align:center;margin-bottom:2px;}
 .login-card .login-sub{font-size:13px;color:var(--ink-soft);text-align:center;margin-bottom:var(--space-5);}
 .login-form{background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:var(--space-5) var(--space-4);}
 .login-form .field-label{margin-top:var(--space-3);}
@@ -1670,9 +1671,12 @@ function renderWeightChart(){
     summary.textContent = '';
     return;
   }
-  const W = 320, H = 180;
-  const padTop = 28, padBottom = 36, padLeft = 10, padRight = 10;
-  const plotW = W - padLeft - padRight;
+  const H = 180;
+  const padTop = 28, padBottom = 36, padLeft = 16, padRight = 16;
+  const pointSpacing = 30; // fixed px between points — chart grows wider instead of squeezing dots together
+  const minPlotW = 260;
+  const plotW = Math.max(minPlotW, (series.length - 1) * pointSpacing);
+  const W = padLeft + padRight + plotW;
   const plotH = H - padTop - padBottom;
 
   const weights = series.map(s=>s.weight);
@@ -1725,21 +1729,23 @@ function renderWeightChart(){
   }
 
   wrap.innerHTML = `
-    <svg class="weight-chart-svg" id="weightChartSvg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
-      <line x1="${padLeft}" y1="${yMax}" x2="${W-padRight}" y2="${yMax}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3"/>
-      <line x1="${padLeft}" y1="${yMin}" x2="${W-padRight}" y2="${yMin}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3"/>
-      <path d="${areaD}" fill="var(--cream)" stroke="none"/>
-      <path d="${pathD}" fill="none" stroke="var(--herb)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-      ${circles}
-      <text x="${padLeft}" y="${H-10}" class="weight-chart-axis" text-anchor="start">${formatShortDate(first.date)}</text>
-      <text x="${W-padRight}" y="${H-10}" class="weight-chart-axis" text-anchor="end">${formatShortDate(last.date)}</text>
-      ${isFlat
-        ? `<text x="${W-padRight}" y="${padTop + plotH/2 - 10}" class="weight-chart-axis" text-anchor="end">${maxW.toFixed(1)} ק"ג</text>`
-        : `<text x="${W-padRight}" y="${yMax-8}" class="weight-chart-axis" text-anchor="end">${maxW.toFixed(1)} ק"ג</text>
-      <text x="${W-padRight}" y="${yMin+16}" class="weight-chart-axis" text-anchor="end">${minW.toFixed(1)} ק"ג</text>`}
-      ${tooltipLabel(lastPoint)}
-    </svg>
-    <div class="bmi-hint" style="text-align:center;margin-top:4px;">הקש/י על נקודה בגרף לראות תאריך ומשקל מדויקים</div>
+    <div class="weight-chart-scroll" id="weightChartScroll" dir="ltr">
+      <svg class="weight-chart-svg" id="weightChartSvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+        <line x1="${padLeft}" y1="${yMax}" x2="${W-padRight}" y2="${yMax}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="${padLeft}" y1="${yMin}" x2="${W-padRight}" y2="${yMin}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3"/>
+        <path d="${areaD}" fill="var(--cream)" stroke="none"/>
+        <path d="${pathD}" fill="none" stroke="var(--herb)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        ${circles}
+        <text x="${padLeft}" y="${H-10}" class="weight-chart-axis" text-anchor="start">${formatShortDate(first.date)}</text>
+        <text x="${W-padRight}" y="${H-10}" class="weight-chart-axis" text-anchor="end">${formatShortDate(last.date)}</text>
+        ${isFlat
+          ? `<text x="${W-padRight}" y="${padTop + plotH/2 - 10}" class="weight-chart-axis" text-anchor="end">${maxW.toFixed(1)} ק"ג</text>`
+          : `<text x="${W-padRight}" y="${yMax-8}" class="weight-chart-axis" text-anchor="end">${maxW.toFixed(1)} ק"ג</text>
+        <text x="${W-padRight}" y="${yMin+16}" class="weight-chart-axis" text-anchor="end">${minW.toFixed(1)} ק"ג</text>`}
+        ${tooltipLabel(lastPoint)}
+      </svg>
+    </div>
+    <div class="bmi-hint" style="text-align:center;margin-top:4px;">אפשר לגלול בגרף • הקש/י על נקודה לתאריך ומשקל מדויקים</div>
   `;
   document.getElementById('weightChartSvg').querySelectorAll('.wc-point').forEach(circle=>{
     circle.addEventListener('click', ()=>{
@@ -1749,6 +1755,9 @@ function renderWeightChart(){
       document.getElementById('weightChartSvg').insertAdjacentHTML('beforeend', tooltipLabel(p));
     });
   });
+  // Scroll to show the most recent (rightmost) data by default
+  const scrollEl = document.getElementById('weightChartScroll');
+  scrollEl.scrollLeft = scrollEl.scrollWidth;
   summary.className = 'bmi-hint' + (totalDiff > 0 ? ' weight-success' : '');
   summary.innerHTML = `<span style="color:${diffColor};font-weight:700;">${diffLabel}</span> מאז ${startingLabel} (${fullSeries.length} מדידות בסה"כ)`;
 }
