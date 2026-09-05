@@ -1,4 +1,4 @@
-// netlify/functions/analyze-food.js
+// // netlify/functions/analyze-food.js
 //
 // Securely proxies food-photo analysis requests to Google's Gemini API.
 // The Gemini API key lives only here, as a Netlify environment variable
@@ -6,7 +6,7 @@
 //
 // Get a free API key at https://aistudio.google.com/apikey
 
-const GEMINI_MODEL = "gemini-2.5-flash"; // change here if Google renames/retires this model
+const GEMINI_MODEL = "gemini-flash-latest"; // change here if Google renames/retires this model
 
 const PROMPT = `התבונן בתמונה בעיון וזהה רק מזון שבאמת נראה בה בפועל. אם התמונה מציגה מזון ארוז/ממותג (כמו חטיף, סוכרייה, שוקולד) גם ללא תווית תזונה גלויה — תן הערכה סבירה על סמך ערכים תזונתיים טיפוסיים למוצר דומה או לקטגוריה שלו (לדוגמה: סוכריה קשה בודדת כ-20-25 קלוריות), ואל תסרב במקרה כזה. אך אם התמונה אינה ברורה, פגומה, ריקה, או שאינך רואה בה מזון כלל — אסור לך להמציא פריט מזון שאינו נראה בפועל; במקרה כזה החזר מערך items ריק. עבור כל פריט אמיתי שזיהית, הערך גודל מנה סביר בגרמים וחשב קלוריות, חלבון, פחמימות, שומן וסיבים תזונתיים למנה הזו. השב אך ורק ב-JSON תקין בפורמט המדויק הזה: {"items":[{"name":"שם המזון בעברית","grams":מספר,"kcal":מספר,"protein":מספר,"carbs":מספר,"fat":מספר,"fiber":מספר}]}`;
 
