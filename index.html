@@ -203,6 +203,24 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 .meal-summary .ms-macro .v{font-family:var(--font-mono);font-size:14px;font-weight:700;}
 .meal-summary .ms-macro .k{font-size:9.5px;color:var(--ink-soft);text-transform:uppercase;margin-top:2px;}
 
+/* ---------- Meal rating (photo scan) ---------- */
+.meal-rating{
+  display:flex;align-items:center;gap:12px;border-radius:var(--radius-sm);padding:12px 14px;
+  margin-bottom:var(--space-3);
+}
+.meal-rating.good{background:#E8F3EA;}
+.meal-rating.mid{background:#FBF3E1;}
+.meal-rating.low{background:#FBEFE9;}
+.meal-rating .mr-score{
+  flex-shrink:0;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-weight:800;font-size:17px;color:#fff;
+}
+.meal-rating.good .mr-score{background:var(--herb);}
+.meal-rating.mid .mr-score{background:var(--turmeric);}
+.meal-rating.low .mr-score{background:var(--paprika);}
+.meal-rating .mr-label{font-weight:700;font-size:13.5px;}
+.meal-rating .mr-note{font-size:11.5px;color:var(--ink-soft);margin-top:2px;line-height:1.4;}
+
 /* ---------- BMI / Goal calculator ---------- */
 .bmi-inputs{display:flex;gap:var(--space-2);margin-bottom:var(--space-3);}
 .bmi-inputs > div{flex:1;}
@@ -1131,6 +1149,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
 <div class="overlay hidden" id="photoReviewOverlay">
   <div class="sheet">
     <h3>זיהוי מהתמונה</h3>
+    <div id="mealRatingWrap"></div>
     <div class="meta">סמן/י אילו פריטים להוסיף ליומן. הכמויות הן הערכה בלבד — אפשר לערוך.</div>
     <div id="detectedList"></div>
     <div class="meal-summary" id="mealSummary"></div>
@@ -2934,6 +2953,7 @@ const photoInputGallery = document.getElementById('photoInputGallery');
 const photoStatus = document.getElementById('photoStatus');
 const photoReviewOverlay = document.getElementById('photoReviewOverlay');
 let detectedItems = [];
+let lastMealRating = null;
 let lastPhotoThumb = null;
 
 function makeThumbnail(file){
@@ -3005,6 +3025,7 @@ async function handlePhotoFile(file, inputEl){
       f: it.fat || 0,
       fi: it.fiber || 0
     }));
+    lastMealRating = parsed.rating || null;
     photoStatus.innerHTML = '';
     if(detectedItems.length === 0){
       alert('לא זוהה מזון בתמונה. נסה תמונה ברורה יותר.');
@@ -3038,6 +3059,22 @@ function fileToBase64(file){
 }
 
 function openPhotoReview(){
+  const ratingWrap = document.getElementById('mealRatingWrap');
+  if(lastMealRating && lastMealRating.score != null){
+    const score = Math.max(1, Math.min(10, Math.round(lastMealRating.score)));
+    const tier = score >= 7 ? 'good' : (score >= 4 ? 'mid' : 'low');
+    ratingWrap.innerHTML = `
+      <div class="meal-rating ${tier}">
+        <div class="mr-score">${score}/10</div>
+        <div>
+          <div class="mr-label">${escapeHtml(lastMealRating.label || 'דירוג הארוחה')}</div>
+          ${lastMealRating.note ? `<div class="mr-note">${escapeHtml(lastMealRating.note)}</div>` : ''}
+        </div>
+      </div>
+    `;
+  } else {
+    ratingWrap.innerHTML = '';
+  }
   const list = document.getElementById('detectedList');
   list.innerHTML = detectedItems.map((it, idx) => `
     <label class="detected-item">
