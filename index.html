@@ -137,13 +137,6 @@ input:focus, select:focus{border-color:var(--herb);outline:none;background:#fff;
 
 /* ---------- Search ---------- */
 .search-row{position:relative;}
-.search-row input{padding-left:44px;}
-.voice-btn{
-  position:absolute;top:6px;left:6px;width:34px;height:34px;border:none;border-radius:50%;
-  background:var(--cream-deep);color:var(--ink);font-size:15px;display:flex;align-items:center;justify-content:center;
-}
-.voice-btn.listening{background:var(--paprika);color:#fff;animation:voicePulse 1s ease-in-out infinite;}
-@keyframes voicePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
 .results{margin-top:var(--space-2);max-height:260px;overflow-y:auto;border-radius:var(--radius-sm);}
 .result-item{
   display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);
@@ -461,6 +454,7 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
 .whatsnew-badge{font-size:44px;margin-bottom:8px;}
 .whatsnew-title{font-family:var(--font-display);font-weight:800;font-size:21px;color:var(--ink);margin-bottom:14px;}
 .whatsnew-list{list-style:none;padding:0;margin:0 0 20px;text-align:right;}
+.onboarding-msg{font-size:13.5px;color:var(--ink);line-height:1.6;margin-bottom:20px;}
 .whatsnew-list li{
   font-size:13px;color:var(--ink);padding:8px 0 8px 4px;border-bottom:1px dashed var(--line);
   display:flex;align-items:flex-start;gap:8px;
@@ -886,7 +880,6 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
         <h2>הוספת מזון</h2>
         <div class="search-row">
           <input type="text" id="foodSearch" placeholder="חפש מזון... (למשל: חומוס, אורז, חזה עוף)" autocomplete="off">
-          <button type="button" id="voiceSearchBtn" class="voice-btn" aria-label="חיפוש קולי">🎤</button>
           <div class="results" id="searchResults"></div>
         </div>
         <button class="add-custom" id="addCustomBtn">+ מזון לא נמצא? הוסף מזון מותאם אישית</button>
@@ -1208,6 +1201,16 @@ footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:var(--spac
   </div>
 </div>
 
+<!-- Onboarding popup for a new user's first 3 logins -->
+<div class="whatsnew-overlay hidden" id="onboardingOverlay">
+  <div class="whatsnew-card">
+    <div class="whatsnew-badge" id="onboardingBadge">👋</div>
+    <div class="whatsnew-title" id="onboardingTitle"></div>
+    <div class="onboarding-msg" id="onboardingMsg"></div>
+    <button class="whatsnew-close" id="onboardingCloseBtn">הבנתי, תודה!</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js"></script>
 <script>
 // ---------- Food database (per 100g) ----------
@@ -1373,7 +1376,78 @@ const FOOD_DB = [
   {name:"יין לבן",cat:"משקאות",kcal:82,p:0.1,c:2.6,f:0,fi:0},
   {name:"שייק חלבון (אבקה + חלב)",cat:"משקאות",kcal:180,p:25,c:10,f:3,fi:1.0,perServing:true},
   {name:"תה ירוק",cat:"משקאות",kcal:1,p:0,c:0,f:0,fi:0},
-  {name:"מיץ לימון סחוט",cat:"משקאות",kcal:22,p:0.4,c:6.9,f:0.2,fi:0.3}
+  {name:"מיץ לימון סחוט",cat:"משקאות",kcal:22,p:0.4,c:6.9,f:0.2,fi:0.3},
+  {name:"אורז בסמטי מבושל",cat:"דגנים",kcal:130,p:2.7,c:28,f:0.3,fi:0.5},
+  {name:"לחמנייה לבנה",cat:"דגנים",kcal:280,p:9,c:53,f:4,fi:2.2},
+  {name:"קרקר מלוח",cat:"דגנים",kcal:430,p:9,c:68,f:14,fi:2.5},
+  {name:"טורטייה תירס",cat:"דגנים",kcal:218,p:5.7,c:44,f:2.8,fi:6.4},
+  {name:"פסטה מחיטה מלאה מבושלת",cat:"דגנים",kcal:124,p:5.3,c:25,f:1.1,fi:3.9},
+  {name:"לחם כוסמין",cat:"דגנים",kcal:240,p:10,c:40,f:4,fi:7.0},
+  {name:"בייגל",cat:"דגנים",kcal:250,p:9,c:49,f:1.5,fi:2.1},
+  {name:"חסה רומאית",cat:"ירקות",kcal:17,p:1.2,c:3.3,f:0.3,fi:2.1},
+  {name:"ארטישוק מבושל",cat:"ירקות",kcal:47,p:3.3,c:10,f:0.2,fi:5.4},
+  {name:"אספרגוס מבושל",cat:"ירקות",kcal:22,p:2.4,c:4,f:0.2,fi:2.0},
+  {name:"כרישה",cat:"ירקות",kcal:61,p:1.5,c:14,f:0.3,fi:1.8},
+  {name:"זוקיני מטוגן",cat:"ירקות",kcal:90,p:1.5,c:6,f:7,fi:1.2},
+  {name:"פטרוזיליה",cat:"ירקות",kcal:36,p:3.0,c:6.3,f:0.8,fi:3.3},
+  {name:"כוסברה",cat:"ירקות",kcal:23,p:2.1,c:3.7,f:0.5,fi:2.8},
+  {name:"שמיר טרי",cat:"ירקות",kcal:43,p:3.5,c:7.3,f:1.1,fi:2.1},
+  {name:"בצל ירוק",cat:"ירקות",kcal:32,p:1.8,c:7.3,f:0.2,fi:2.6},
+  {name:"פירה כרובית",cat:"ירקות",kcal:55,p:3,c:8,f:1.5,fi:3.0},
+  {name:"אגס אסייתי",cat:"פירות",kcal:42,p:0.5,c:11,f:0.2,fi:3.6},
+  {name:"ליצ׳י",cat:"פירות",kcal:66,p:0.8,c:17,f:0.4,fi:1.3},
+  {name:"שסק",cat:"פירות",kcal:70,p:0.6,c:20,f:0.4,fi:5.6},
+  {name:"פפאיה",cat:"פירות",kcal:43,p:0.5,c:11,f:0.3,fi:1.7},
+  {name:"קלמנטינה",cat:"פירות",kcal:47,p:0.9,c:12,f:0.2,fi:1.7},
+  {name:"דובדבן",cat:"פירות",kcal:63,p:1.1,c:16,f:0.2,fi:2.1},
+  {name:"פילה סלמון נא",cat:"חלבון",kcal:208,p:20,c:0,f:13,fi:0},
+  {name:"חזה הודו נא",cat:"חלבון",kcal:135,p:24,c:0,f:4,fi:0},
+  {name:"כתף כבש צלויה",cat:"חלבון",kcal:294,p:24,c:0,f:21,fi:0},
+  {name:"קבב טלה",cat:"חלבון",kcal:280,p:18,c:2,f:22,fi:0.3},
+  {name:"נקניק בקר מטוגן",cat:"חלבון",kcal:280,p:13,c:3,f:24,fi:0},
+  {name:"פסטרמת הודו",cat:"חלבון",kcal:110,p:17,c:2,f:4,fi:0},
+  {name:"כבד בקר מטוגן",cat:"חלבון",kcal:175,p:22,c:4,f:7,fi:0},
+  {name:"אפונה מבושלת",cat:"קטניות",kcal:84,p:5.4,c:14,f:0.4,fi:5.5},
+  {name:"פול מבושל",cat:"קטניות",kcal:110,p:7.6,c:19,f:0.6,fi:5.4},
+  {name:"שעועית לבנה מבושלת",cat:"קטניות",kcal:127,p:8.7,c:23,f:0.5,fi:6.3},
+  {name:"מיונז לייט",cat:"רטבים",kcal:263,p:1,c:6,f:26,fi:0},
+  {name:"רוטב צ׳ילי חריף",cat:"רטבים",kcal:95,p:1.9,c:19,f:0.9,fi:2.5},
+  {name:"פסטו",cat:"רטבים",kcal:380,p:4,c:6,f:38,fi:1.9},
+  {name:"חומוס בטעם שום",cat:"רטבים",kcal:175,p:8,c:14,f:10,fi:6.0},
+  {name:"גבינה בולגרית",cat:"מוצרי חלב",kcal:265,p:14,c:1,f:23,fi:0},
+  {name:"גבינת פטה",cat:"מוצרי חלב",kcal:264,p:14,c:4,f:21,fi:0},
+  {name:"יוגורט דל שומן בטעם פרי",cat:"מוצרי חלב",kcal:95,p:4,c:17,f:1,fi:0.3},
+  {name:"קפיר",cat:"מוצרי חלב",kcal:41,p:3.4,c:4.5,f:1,fi:0},
+  {name:"ריקוטה",cat:"מוצרי חלב",kcal:174,p:11,c:3,f:13,fi:0},
+  {name:"אגוזי פקאן",cat:"אגוזים",kcal:691,p:9,c:14,f:72,fi:9.6},
+  {name:"טחינה משומשום שלם",cat:"אגוזים",kcal:595,p:18,c:14,f:52,fi:9.3},
+  {name:"שמן אבוקדו",cat:"שומנים",kcal:884,p:0,c:0,f:100,fi:0},
+  {name:"שמן שומשום",cat:"שומנים",kcal:884,p:0,c:0,f:100,fi:0},
+  {name:"קרם קרמל",cat:"ממתקים",kcal:150,p:3.5,c:22,f:5,fi:0},
+  {name:"בקלאווה",cat:"ממתקים",kcal:330,p:4.5,c:40,f:18,fi:1.5},
+  {name:"קראנץ׳ חמאת בוטנים",cat:"ממתקים",kcal:500,p:10,c:50,f:28,fi:3.0},
+  {name:"דגני בוקר עם דבש",cat:"דגני בוקר",kcal:380,p:6,c:82,f:2,fi:3.0},
+  {name:"מוזלי",cat:"דגני בוקר",kcal:360,p:9,c:65,f:6,fi:7.5},
+  {name:"פוקצ׳ה עם זעתר",cat:"ארוחות מוכנות",kcal:310,p:8,c:48,f:9,fi:2.6,perServing:true},
+  {name:"קובה בורגול",cat:"ארוחות מוכנות",kcal:220,p:10,c:25,f:9,fi:3.5,perServing:true},
+  {name:"מוסקה חצילים",cat:"ארוחות מוכנות",kcal:210,p:8,c:14,f:13,fi:3.0,perServing:true},
+  {name:"קארי עוף עם אורז",cat:"ארוחות מוכנות",kcal:420,p:26,c:45,f:14,fi:3.0,perServing:true},
+  {name:"פאד תאי",cat:"ארוחות מוכנות",kcal:450,p:16,c:60,f:14,fi:2.5,perServing:true},
+  {name:"בורגר טבעוני",cat:"ארוחות מוכנות",kcal:220,p:11,c:22,f:9,fi:5.0,perServing:true},
+  {name:"טאקו בקר",cat:"ארוחות מוכנות",kcal:210,p:11,c:16,f:11,fi:2.2,perServing:true},
+  {name:"בייגל עם גבינה",cat:"ארוחות מוכנות",kcal:320,p:14,c:48,f:8,fi:2.0,perServing:true},
+  {name:"קרפ מתוק",cat:"ארוחות מוכנות",kcal:220,p:6,c:30,f:8,fi:1.0,perServing:true},
+  {name:"מים",cat:"משקאות",kcal:0,p:0,c:0,f:0,fi:0},
+  {name:"משקה איזוטוני",cat:"משקאות",kcal:24,p:0,c:6,f:0,fi:0},
+  {name:"שוקו",cat:"משקאות",kcal:85,p:3.4,c:11,f:3,fi:0.5},
+  {name:"לימונדה",cat:"משקאות",kcal:40,p:0.1,c:10,f:0,fi:0.1},
+  {name:"קפוצ׳ינו",cat:"משקאות",kcal:80,p:4,c:6,f:4,fi:0,perServing:true},
+  {name:"פופקורן ממותק",cat:"חטיפים",kcal:480,p:6,c:65,f:22,fi:3.7},
+  {name:"צ׳יפס תפוחי אדמה",cat:"חטיפים",kcal:536,p:6.6,c:53,f:35,fi:4.8},
+  {name:"פריכיות תירס",cat:"חטיפים",kcal:380,p:6,c:76,f:6,fi:3.6},
+  {name:"חטיף אנרגיה (בר גרנולה)",cat:"חטיפים",kcal:380,p:8,c:60,f:12,fi:5.5},
+  {name:"אורז ירקות",cat:"תוספות",kcal:160,p:3.5,c:30,f:3,fi:1.8},
+  {name:"תפוחי אדמה מטוגנים (צ׳יפס בית)",cat:"תוספות",kcal:312,p:3.4,c:41,f:15,fi:3.8}
 ];
 
 const STORAGE_BASE = "calTracker_v1";
@@ -1490,8 +1564,9 @@ let customFoods = [];
 let currentOffset = 0; // days from today
 let selectedFood = null;
 
-const APP_VERSION = "1.1";
+const APP_VERSION = "1.2";
 const WHATS_NEW_ITEMS = [
+  { emoji:"⭐", text:"דירוג איכות לארוחה אחרי צילום — ציון, תווית והסבר קצר" },
   { emoji:"🌾", text:"מעקב סיבים תזונתיים מלא — נוסף לכל מזון במאגר" },
   { emoji:"🏅", text:"תגי הישג חדשים במסך הבית" },
   { emoji:"🎤", text:"חיפוש מזון בקול" },
@@ -1529,6 +1604,38 @@ document.getElementById('whatsNewCloseBtn').addEventListener('click', ()=>{
   document.getElementById('whatsNewOverlay').classList.add('hidden');
 });
 
+const ONBOARDING_MESSAGES = [
+  {
+    badge: "👋",
+    title: "ברוכים הבאים ל'יורדים בגדול'!",
+    msg: "זה המקום שלך למעקב קליל אחרי מה שאתה אוכל, בלי שיפוטיות. כדי להתחיל, פשוט חפש מזון בדף 'הוספת מזון', או צלם ארוחה ותן ל-AI לזהות אותה בשבילך."
+  },
+  {
+    badge: "💪",
+    title: "כיף לראות אותך שוב!",
+    msg: "טיפ קטן: כפתורי ה\"הוספה מהירה\" בדף 'הוספת מזון' חוסכים המון זמן על פריטים שאתה אוכל הרבה. וכדאי גם להציץ בטאב 'מסך בית' — שם תמצא את המחשבונים, מעקב המשקל, ותגי ההישג שלך."
+  },
+  {
+    badge: "🌟",
+    title: "כניסה שלישית — אלוף/ה!",
+    msg: "התמדה זה הכל. נסה לשמור משקל מדי כמה ימים כדי לראות את הגרף שלך מתמלא, ותן הצצה ל\"התייעצות AI\" אם יש לך שאלה על התזונה שלך היום."
+  }
+];
+
+function checkOnboarding(){
+  const count = bmiData.loginCount || 0;
+  if(count >= 1 && count <= 3){
+    const m = ONBOARDING_MESSAGES[count - 1];
+    document.getElementById('onboardingBadge').textContent = m.badge;
+    document.getElementById('onboardingTitle').textContent = m.title;
+    document.getElementById('onboardingMsg').textContent = m.msg;
+    document.getElementById('onboardingOverlay').classList.remove('hidden');
+  }
+}
+document.getElementById('onboardingCloseBtn').addEventListener('click', ()=>{
+  document.getElementById('onboardingOverlay').classList.add('hidden');
+});
+
 function bumpAchievement(key){
   if(!bmiData.achCounters) bmiData.achCounters = { photoScans:0, barcodeScans:0, aiQuestions:0, aiDayAnalyses:0 };
   bmiData.achCounters[key] = (bmiData.achCounters[key] || 0) + 1;
@@ -1548,6 +1655,13 @@ function enterApp(userId, name){
   currentUserName = name;
   localStorage.setItem(SESSION_KEY, JSON.stringify({id:userId, name}));
   const isBrandNewUser = loadUserData();
+  if(isBrandNewUser){
+    bmiData.loginCount = 0;
+  } else if(bmiData.loginCount == null){
+    bmiData.loginCount = 999; // existing user from before this feature — skip onboarding retroactively
+  }
+  bmiData.loginCount += 1;
+  saveBmi(bmiData);
   document.getElementById('userNameLabel').textContent = name;
   document.getElementById('userAvatar').textContent = initials(name);
   document.getElementById('loginScreen').classList.add('hidden');
@@ -1556,6 +1670,7 @@ function enterApp(userId, name){
   render();
   renderBmi();
   checkWhatsNew(isBrandNewUser);
+  checkOnboarding();
 }
 
 function seedDefaultUsers(){
@@ -2559,48 +2674,6 @@ document.getElementById('analyzeDayBtn').addEventListener('click', async ()=>{
 // ---------- Search ----------
 const searchInput = document.getElementById('foodSearch');
 const resultsBox = document.getElementById('searchResults');
-
-// ---------- Voice search ----------
-const voiceBtn = document.getElementById('voiceSearchBtn');
-const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-if(!SpeechRecognitionAPI){
-  voiceBtn.style.display = 'none';
-} else {
-  let recognition = null;
-  let isListening = false;
-  voiceBtn.addEventListener('click', ()=>{
-    if(isListening){
-      recognition && recognition.stop();
-      return;
-    }
-    recognition = new SpeechRecognitionAPI();
-    recognition.lang = 'he-IL';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    isListening = true;
-    voiceBtn.classList.add('listening');
-    recognition.addEventListener('result', (e)=>{
-      const transcript = e.results[0][0].transcript;
-      searchInput.value = transcript;
-      searchInput.dispatchEvent(new Event('input'));
-    });
-    recognition.addEventListener('error', (e)=>{
-      if(e.error !== 'aborted' && e.error !== 'no-speech'){
-        alert('לא הצלחתי לזהות דיבור. נסה שוב או הקלד ידנית.');
-      }
-    });
-    recognition.addEventListener('end', ()=>{
-      isListening = false;
-      voiceBtn.classList.remove('listening');
-    });
-    try{
-      recognition.start();
-    }catch(err){
-      isListening = false;
-      voiceBtn.classList.remove('listening');
-    }
-  });
-}
 
 searchInput.addEventListener('input', ()=>{
   const q = searchInput.value.trim();
